@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POWER FRAME 850 × Vintage 完全網羅文法道場</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .fade-in { animation: fadeIn 0.4s ease-in-out; }
+    .slide-in { animation: slideIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 selection:bg-blue-200 selection:text-blue-900 min-h-screen">
+  
+  <div id="app" class="h-full min-h-screen"></div>
+
+  <script>
+    // --- 分野別の丁寧なポイント解説（グループ共通） ---
+    const conceptGroups = {
+      "S1-ics": { title: "📌 -ics で終わる学問名の単数扱い", e: "Physics（物理学）、Mathematics（数学）、Economics（経済学）などの学問名は、語尾に -s がついていても不可算名詞（単数扱い）となり、単数動詞（is / was）をとります。" },
+      "S1-cor": { title: "📌 相関表現の主語と動詞の一致", e: "「either A or B」「neither A nor B」「not only A but also B」は、動詞に近い『B』に動詞を一致させます。逆に「B as well as A」は先頭の『B』に一致させるので注意しましょう！" },
+      "S1-num": { title: "📌 a number of と the number of", e: "「a number of ＋複数名詞」は『たくさんの〜（＝many）』で複数扱い（are）、「the number of ＋複数名詞」は『〜の数』で単数扱い（is）になります。" },
+      "S1-mod": { title: "📌 長い修飾語句に惑わされない主語の特定", e: "前置詞句・関係詞節・分詞・同格のカンマが主語の後ろに長く続いても、文の骨格となる「真の主語（One / The list / The committee など）」の単数・複数に動詞を一致させます。" },
+      "S1-there": { title: "📌 There 構文の主語と動詞の一致", e: "「There ＋ V ＋ S」の構文では、動詞の後ろにある意味上の主語『S』の単数・複数に動詞（is/are, remain/remains など）を一致させます。" },
+      "S2-so": { title: "📌 So / Neither ＋ V ＋ S（〜もそうだ／〜ない）", e: "肯定文に同意する「So ＋助動詞/be動詞＋主語」と、否定文に同意する「Neither [Nor] ＋助動詞/be動詞＋主語」は、必ず疑問文と同じ倒置語順になります。" },
+      "S2-neg": { title: "📌 否定語句の文頭倒置", e: "Never before や Not until 〜、nor などの否定語句が節の先頭に立つと、その後ろは「助動詞/be動詞＋主語＋動詞」という疑問文の語順に倒置されます。" },
+      "S2-cleft": { title: "📌 It is [was] 〜 that ... の強調構文", e: "強調したい語句（名詞・副詞句・when節など）を It is [was] と that の間に挟む構文です。副詞句や節を強調するときは which ではなく that を使います。" },
+      "S2-q": { title: "📌 疑問詞の強調 on earth", e: "What / Why / How などの疑問詞の直後に「on earth（または in the world）」を置くと、『いったいぜんたい〜なのか』と疑問を強める働きをします。" },
+      "S2-omit": { title: "📌 副詞節内の S + be の省略と if any / if ever", e: "接続詞 while や if の直後では「主節と同じ主語＋be動詞」が省略されて while doing や if not done になります。また「if any（もしあれば＝量）」「if ever（めったに〜ない＝頻度）」の区別も超重要です。" },
+      "S3-non": { title: "📌 前文全体を受ける非制限用法の which", e: "「カンマ＋which」は、直前の名詞だけでなく『前の文の内容全体』を先行詞にとることができます（that や what は不可）。" },
+      "S3-prep": { title: "📌 前置詞＋関係代名詞 (to which / in which / for which)", e: "自動詞＋前置詞（refer to, apply for）や場所・道具（in the museum, with the tools）を表す場合、前置詞を関係代名詞の前に置きます。前置詞の直後に that は置けません。" },
+      "S3-whose": { title: "📌 所有格の関係代名詞 whose と of which", e: "先行詞が「物」であっても、直後に無冠詞の名詞が続く場合は所有格の whose（whose meaning）を使えます。名詞に the がつく場合は「of which ... the 名詞」となります。" },
+      "S3-adv": { title: "📌 関係副詞 where / why と完全文・不完全文", e: "先行詞が場所でも後ろが「完全文」なら where、「不完全文（主語・目的語欠け）」なら which を使います。また「That's why ＋結果（そういうわけで）」も頻出です。" },
+      "S3-chain": { title: "📌 連鎖関係代名詞（S + think / believe の挿入）", e: "関係代名詞の直後に「I think / I believe」が挿入されている場合、それをカッコに入れて取り除くと、後ろの動詞の主語となる主格の who が必要だと見抜けます。" },
+      "S4-what": { title: "📌 先行詞を含む関係代名詞 what の重要構文", e: "「what S is/was（今の/昔のSの姿）」「what you call（いわゆる）」「A is to B what C is to D（AとBの関係はCとDと同じ）」は丸ごと覚えましょう。" },
+      "S4-adj": { title: "📌 関係形容詞 what (what little 名詞 S + V)", e: "「what (little) ＋名詞＋ S + can [have]」で『（少ないながらも）Sができる［持っている］限りのすべての〜（なけなしの〜）』を表します。" },
+      "S4-how": { title: "📌 However / No matter how ＋形容詞/副詞＋ S + V", e: "「どんなに〜でも」を表す譲歩構文では、直後に形容詞や副詞が来る場合、Whatever ではなく However または No matter how を使います。" },
+      "S4-ever": { title: "📌 複合関係詞 whatever / whoever / whenever / wherever", e: "前置詞 to の後ろでも、後ろの節の中で主語になる場合は目的格 whomever ではなく主格の whoever を使います。" },
+      "S5-that": { title: "📌 名詞節・同格の接続詞 that", e: "文頭で主語になる「That ＋完全文」や、抽象名詞の中身を説明する「The fact that ＋完全文」「There's no doubt that ＋完全文」では、関係代名詞ではなく接続詞 that を使います。" },
+      "S5-so": { title: "📌 so 〜 that ... と such 〜 that ... の語順", e: "「so ＋形容詞/副詞＋ that」「so ＋形容詞＋ a ＋単数名詞＋ that」「such ＋ a ＋形容詞＋単数名詞＋ that」の語順を正確に区別しましょう。" },
+      "S5-purp": { title: "📌 目的を表す so that S + can/could/would V", e: "「〜するために・〜できるように」という目的を表す副詞節には〈so that S + 助動詞 + V〉を用います。" },
+      "S5-time": { title: "📌 時・比例・直後の接続詞 (Hardly / no sooner / every time)", e: "「Hardly had S + p.p. when/before 〜（〜するやいなや）」の文頭倒置や、「every time S + V（〜するたびに）」「It was 〜 before ...（〜するまでに…かかった）」が頻出です。" },
+      "S5-imp": { title: "📌 命令文, and / or 〜 と群接続詞 in that", e: "「命令文, and 〜（そうすれば）」「命令文, or 〜（さもないと）」の対比と、前置詞の後ろに that を置く例外である群接続詞「in that 〜（〜という点で）」を押さえましょう。" },
+      "S6-cond": { title: "📌 条件を表す接続詞 (unless / provided / supposing / as long as)", e: "「unless（〜しない限り）」「provided / supposing（もし〜ならば）」「on condition that（〜という条件で）」「as long as（〜しさえすれば＝条件）」は、副詞節内では未来も現在形で表します。" },
+      "S6-case": { title: "📌 備えを表す in case S + (should) V", e: "「万一〜するといけないから・〜する場合に備えて」は群接続詞〈in case〉で表します。目的の so that との意味の違いに注意しましょう。" },
+      "S6-conc": { title: "📌 譲歩の接続詞と倒置 (even though / even if / 形容詞 + as S + V)", e: "「Beautiful as she is（彼女は美しいけれども）」のように、補語の形容詞が文頭に出る譲歩の倒置構文や、文頭の主語節に使える Whether 〜 or not が狙われます。" },
+      "S7-err": { title: "📌 誤文訂正・2空所補充・別空所の実戦演習", e: "主語と動詞の数の一致、文頭否定語による倒置、共通空所に入る関係詞・接続詞、相関接続詞ペア（neither...nor / so that...could）を総点検します。" },
+      "V-inv": { title: "📌 Vintage 倒置・語順の特殊ルール", e: "否定語句（Never / Little / At no time / Not only / Only recently / Rarely / In no other 〜 / Not a word）や so / neither / nor が節頭に出ると疑問文語順に倒置します。また「so / as / too ＋形容詞＋ a ＋単数名詞」の語順も超頻出です。" },
+      "V-cleft": { title: "📌 Vintage 強調構文・動詞の強調・省略", e: "「It is [was] 〜 that [who/whom] ...」の強調構文（特に It is not until A that B の形）、一般動詞の直前に置く強調の do / does / did、他動詞＋代名詞の語順（pick them up / give it up）、if not（〜でないとしても）などの省略を押さえましょう。" },
+      "V-nar": { title: "📌 Vintage 話法の転換 (Direct ⇔ Indirect Speech)", e: "伝達動詞が過去（said / told / asked）のとき、時制の一致・代名詞・副詞の変換を行います。命令文は「tell O (not) to V」、提案の Let's は「suggest that S (should) 原形」、疑問文は「ask O if/wh節（平叙文語順）」に転換します。" }
+    };
+
+    // --- 全179問 完全網羅データ（PF850 123問 ＋ Vintage 56問） ---
+    // 書式: ID|カテゴリ|タイプ|問題文|選択肢(^)区切り|正解(1-4)|個別解説|グループID|作問者の意図
+    const rawData = `
+F1-01|一致・数|c|物理は私の大好きな科目だ。\\nPhysics (   ) my favorite subject.|are^were^is^have been|3|「Physics（物理学）」「Mathematics（数学）」「Economics（経済学）」など -ics で終わる学問名は、語尾に -s がついていても不可算名詞（単数扱い）となり、単数動詞 is をとります。|S1-ics|語尾の -s に釣られて複数動詞 are / were を選ばせる典型的なひっかけ問題です。
+F1-02|一致・数|c|数学は多くの生徒にとってとても難しい。\\nMathematics (   ) very difficult for many students.|are^be^is^were|3|Mathematics（数学）は -ics で終わる学問名なので単数扱いです。直後に many students がありますが、主語はあくまで Mathematics です。|S1-ics|-ics で終わる学科名が単数動詞 is をとる基本知識を問うています。
+F1-03|一致・数|c|ビルか私のどちらかが議長に選ばれる予定だ。\\nEither Bill or I (   ) going to be elected chairman.|am^are^is^were|1|〈either A or B（AかBのどちらか）〉が主語になる場合、動詞は「B（動詞に近い方）」の人称・数に一致させます。ここでは B が I なので am が正解です。|S1-cor|Bill に合わせて is にしたり、2人だからと are にする誤りを狙っています。
+F1-04|一致・数|c|ジェーンか私のどちらかが上司のためにレポートを清書しなければならない。\\nEither Jane or I (   ) to type up the report for our boss.|have^has^must^will|1|〈either A or B〉は B に動詞を一致させます。I に合わせて have を選びます。また空所直後に to があるため助動詞 must / will は不可です。|S1-cor|B（I）への動詞の一致と、〈have to V〉の語法を同時に見る良問です。
+F1-05|一致・数|c|近くの大木に雷が落ちたとき，ナンシーも私たちの他の者も動じなかった。\\nNeither Nancy nor the rest of us (   ) when the big tree nearby was hit by lightning.|has upset^have upset^was upset^were upset|4|〈neither A nor B（AもBも〜ない）〉は動詞に近い B（the rest of us＝私たちの残り＝複数）に動詞を一致させるため、過去複数形の were upset が正解です。|S1-cor|Nancy に釣られて was upset を選ばせる罠と、〈be upset（動揺する）〉の語法を狙っています。
+F1-06|一致・数|c|彼だけでなく私にも責任がある。\\nNot only he but also I (   ) to blame.|is^are^am^have|3|〈not only A but also B〉は強調の中心である B（I）に動詞を一致させるため am が正解です。〈be to blame〉で「責任がある」を表します。|S1-cor|同じ意味の〈B as well as A〉との語順・一致方向の違いを正確に区別できるかが狙いです。
+F1-07|一致・数|c|兄弟だけでなくジョンにも責任がある。\\nJohn as well as his brothers (   ) to blame.|are^be^is^were|3|〈B as well as A（AだけでなくBも）〉が主語の場合、主語の核は先頭の B（John＝単数）なので、単数動詞 is を用います。|S1-cor|直前の複数名詞 his brothers に惑わされて are / were を選ぶ受験生をふるい落とす頻出問題です。
+F1-08|一致・数|c|私だけでなく彼もアウトドアスポーツをするのが好きだ。\\nHe as well as I (   ) fond of playing outdoor sports.|is^am^has^have|1|〈He as well as I〉の主語の中心は先頭の He です。直前の I に釣られて am にせず、He に一致させて is を選びます。|S1-cor|空所の直前に I を置くことで、反射的に am を選ばせる絶妙なトラップです。
+F1-09|一致・数|c|教室のいすのうちの1脚がこわれた。\\nOne of the chairs in the classroom (   ) broken.|have been^was^are^were|2|主語の核は先頭の One（1脚）なので単数扱いです。時制も過去なので単数動詞 was が正解となります。|S1-mod|the chairs の複数形に引きずられて were を選ばせる基本かつ重要な一致問題です。
+F1-10|一致・数|c|私が夏休み中に読んだ本のうちの1冊は，『風と共に去りぬ』だった。\\nOne of the books I read during the summer vacation (   ) Gone With the Wind.|are^have been^was^were|3|One of the books (that) I read during the summer vacation の中心主語は先頭の One です。したがって単数動詞 was をとります。|S1-mod|関係詞節で主語を長くし、本来の主語 One を見失わせる作問テクニックです。
+F1-11|一致・数|c|たくさんの科学者が来週の会議に出席する予定である。\\nA number of scientists (   ) going to attend the conference next week.|is^be^are^was|3|〈a number of ＋複数名詞〉は「たくさんの〜（＝many）」という意味で、複数扱い（動詞は are）になります。|S1-num|〈the number of 〜（〜の数＝単数扱い）〉との対比を問う、入試超頻出ペアの片方です。
+F1-12|一致・数|c|クラスの生徒の数は15人に限られている。\\nThe number of students in the class (   ) limited to fifteen.|is^are^will^can|1|〈the number of ＋複数名詞〉は「〜の数」という意味で、主語の核は the number（単数）です。よって is が正解です。|S1-num|students に釣られて are を選ばせる問題。〈a number of〉との識別が最重要です。
+F1-13|一致・数|c|負傷した人の数は，予想より多かった。\\nThe number of people who (   ) was greater than they had expected.|was injured^were injured^has been injured^have been injured|2|文全体の主語は The number（だから後ろは was greater）ですが、関係代名詞 who の先行詞は直前の people（複数）なので、who節内は過去複数形の were injured となります。|S1-num|The number の単数と、先行詞 people の複数の2段階の一致を同時に問うハイレベルな良問です。
+F1-14|一致・数|c|この大学での4年の教育課程を終えたあとも研究を続けたいと思う学生の数が増加している。\\nThe number of students who wish to continue their studies after they finish their four-year program at this university (   ) increasing.|is^have^has^are|1|who から university までがすべて students を修飾しています。文全体の主語の核は先頭の The number（単数）なので、述語動詞は is です。|S1-num|主語と動詞の間に16語もの修飾語句を挟み、文全体の骨格（The number ... is increasing）を見抜けるかを試しています。
+F1-15|一致・数|c|彼の言語とさまざまな文化の知識は，彼の仕事にとても役立っている。\\nHis knowledge of languages and different cultures (   ) him a lot in his business.|are helping^are being helped^help^helps|4|of languages and different cultures は前置詞句（修飾語）であり、主語の核は His knowledge（不可算名詞＝単数扱い）なので、三人称単数現在の helps が正解です。|S1-mod|空所直前の複数名詞 languages and different cultures に目を奪われず、真の主語 knowledge を見抜く力を測っています。
+F1-16|一致・数|c|これまでのところ科学者がクローンを作れる家畜動物のリストには，ヒツジ，ウシ，ヤギ，そして実験用のマウスが含まれる。\\nThe list of domesticated animals scientists have been able to clone so far (   ) sheep, cattle, goats and laboratory mice.|including^include^includes^to include|3|scientists have been able to clone so far は関係代名詞が省略された形容詞節で domesticated animals を修飾しています。文全体の主語は先頭の The list（単数）なので、本動詞は includes です。|S1-mod|関係詞の省略を見抜いた上で、複数名詞 animals や scientists に惑わされず The list に一致させる難関大らしい問題です。
+F1-17|一致・数|c|その2か国間で育まれた友好関係は，条約を経て深められた。\\nThe friendly relationship experienced between the two countries (   ) deepened as a result of the treaty.|be^was^are^were|2|experienced between the two countries は過去分詞句で直前の The friendly relationship（単数）を修飾しています。主語は単数なので was が正解です。|S1-mod|experienced を過去形の動詞と誤認させたり、直前の the two countries に釣られて were を選ばせる罠です。
+F1-18|一致・数|c|私がいつか訪れたい場所は，インドのタージマハルとアメリカ合衆国のグランドキャニオンである。\\nThe places I want to visit someday (   ) the Taj Mahal in India and the Grand Canyon in the USA.|are^be^is^will|1|I want to visit someday は The places を修飾する関係詞節です。主語の核は The places（複数）なので、複数動詞 are が正解です。|S1-mod|関係代名詞の目的格省略を見抜き、主語が複数（The places）であることを正確に把握できるかを問うています。
+F1-19|一致・数|c|新政府の政策を検討するために設置された委員会は今月すでに2回の会合があり，税金を減らすべきであるとの決定が下されている。\\nThe committee that was set up to review the new government policies (   ) met twice this month, and it has been decided that taxes should be reduced.|has already^have already^still has not^still have not|1|関係詞節内で that was set up と単数扱いされている通り、ここでの The committee（委員会）は1つの組織全体として単数扱いされています。したがって has already が正解です。|S1-mod|直前の複数名詞 policies に惑わされず、かつ関係詞節内の was というヒントから単数扱いを見抜けるかがポイントです。
+F1-20|一致・数|c|外交委員会の委員長であるタナカ氏は，来賓講演者としてその研究会に招待された。\\nMr. Tanaka, the chairperson of the Committee on Foreign Relations, (   ) to the seminar as a guest speaker.|was inviting^were inviting^was invited^were invited|3|カンマで挟まれた the chairperson of the Committee on Foreign Relations は主語 Mr. Tanaka の同格説明です。主語は単数で「招待された（受動態）」なので was invited が正解です。|S1-mod|Foreign Relations の複数形に釣られて were にするミスと、能動・受動の区別を同時にチェックしています。
+F1-21|一致・数|c|これまでのところ，私たちは委員会にふさわしい人々を獲得することに集中してきた。現在，委員会には多くの才能ある人々がおり，その中には，有名な生物学者であり，20年間教鞭をとっている，ガーデン大学のウィリアム・ローゼンタール氏がいる。\\nNow the committee has many talented people, among them William Rosenthal of Garden University, a famous biologist, who (   ) for twenty years.|has been taught^have been taught^has been teaching^have been teaching|3|関係代名詞 who の先行詞は William Rosenthal（単数）です。「20年間ずっと教えている（能動の継続）」なので、単数の現在完了進行形 has been teaching が正解です。|S1-mod|talented people / among them に惑わされず、直前の個人名（単数）を先行詞として特定できるかを試しています。
+F1-22|一致・数|c|アメリカ合衆国での教師と生徒の関係は，日本の場合とかなり異なる。日本の教師は子どもと家庭にかなり多く関わる。小学校の教師は家庭訪問をする。\\nThe teacher-student (   ) in the United States is quite different from that in Japan.|relationship^relationships^relative^relatives|1|後ろの動詞が is であり、比較対象の代名詞も単数の that（＝the relationship）になっていることから、主語は単数形の relationship でなければなりません。|S1-mod|文中にある動詞 is と代名詞 that の2つの手がかりから、単数名詞を論理的に導き出す上智大の良問です。
+F1-23|一致・数|c|公園にはたくさんの鳥がいた。\\nThere (   ) a lot of birds in the park.|is^was^were^has|3|〈There is/are 構文〉では、動詞の後ろにある名詞（ここでは a lot of birds＝複数）が意味上の主語になります。したがって過去複数形の were が正解です。|S1-there|There を主語と勘違いして単数動詞を選ばないよう、後ろの名詞の数を見る基本を確認しています。
+F1-24|一致・数|c|その計画に何か問題はありましたか。\\n(   ) there any problems on the project?|Is^Was^Were^Will|3|後ろの意味上の主語が any problems（複数）なので、複数動詞の過去形 Were が正解です。|S1-there|疑問文になって文頭に動詞が出ても、後ろの名詞 any problems の複数形に合わせて Were を選べるかを問うています。
+F1-25|一致・数|c|あなたが日本を訪れる機会はありますか。\\nIs there (   ) of your visiting Japan?|any chance^any chances^fat chances^good chances|1|文頭が単数動詞 Is there で始まっているため、主語も単数形の any chance になります。〈Is there any chance of ＋動名詞〉で「〜する可能性・機会はありますか」という重要表現です。|S1-there|文頭の Is という単数動詞に注意を払い、複数形の chances を確実に排除できるかを見ています。
+F1-26|一致・数|c|この国には今でもよい風習がたくさん残っている。それらには貴重なものもあるが，望ましくないものも多くある。\\nThere still (   ) many good customs in this country. Some of them are precious, but there are many undesirable ones also.|remain^remains^remaining^has remained|1|There is 構文の be動詞の代わりに remain（残っている）が使われた形です。意味上の主語は後ろの many good customs（複数）なので、三単現の -s をつけない remain が正解です。|S1-there|be動詞以外の動詞（remain, exist, liveなど）を用いたThere構文でも、後ろの複数名詞に動詞を一致させる点をついています。
+F1-27|倒置・強調・省略|c|「私は来月休暇をとる予定です」「本当ですか。私もそうなのです」\\n"I'm taking my vacation next month." "Really? (   )"|So I am.^So am I.^So I do.^So do I.|2|肯定の発言に対して「私もそうです」と同意するときは〈So ＋助動詞/be動詞＋主語〉の倒置形にします。相手が I'm taking（be動詞）と言っているので So am I. が正解です（So I am. は「確かにそうですね」と肯定する別表現）。|S2-so|〈So am I（私も同じだ）〉と〈So I am（確かにその通りだ）〉の語順の違い、および be動詞と do の使い分けを狙っています。
+F1-28|倒置・強調・省略|c|「ジェーンはポピュラー音楽が好きではありません」「私も好きではありません」\\n"Jane doesn't like pop music." "(   )"|So do I.^So I do.^Neither do I.^Neither I do.|3|否定文を受けて「私も〜ない」と同意するときは〈Neither [Nor] ＋助動詞/be動詞＋主語〉の倒置形にします。前文が doesn't like（一般動詞の現在形）なので Neither do I. が正解です。|S2-so|否定文への同意には So ではなく Neither を使うこと、そして〈Neither ＋ V ＋ S〉の倒置語順にできるかを問うています。
+F1-29|倒置・強調・省略|c|「私はこれまでにここに来たことがありません」「そうなのですか？ 私も来たことがありません」\\n"I haven't been here before." "Is that so? (   )."|I haven't neither^Nor I haven't^I neither did^Neither have I|4|前文が I haven't been...（現在完了の否定）なので、助動詞 have を用いて〈Neither have I.〉と倒置します。Neither 自体に否定の意味が含まれるため、haven't にすると二重否定で誤りになります。|S2-so|前の時制・助動詞（have）を正しく引き継ぐことと、二重否定を避けることを狙っています。
+F1-30|倒置・強調・省略|c|英単語のつづりは不変ではないし，一般的な合意以外のいかなる権威にも左右されない。\\nThe spelling of English words is not fixed, nor (   ) on any other authority than general agreement.|depends it^does it depend^it depends^it does depend|2|等位接続詞 nor（〜もない）が節の先頭に立つと、その後ろは疑問文と同じ語順（倒置）になります。一般動詞 depend なので助動詞 does を前に出して〈nor does it depend〉とします。|S2-neg|nor の直後が疑問文語順（助動詞＋S＋動詞の原形）になるという倒置の最重要ルールを問うています。
+F1-31|倒置・強調・省略|c|これまでに，ステイシーはどのデートでも，もっとひどかったことはなかった。\\nNever before (   ) had a worse time on any of her dates.|Stacey has^Stacey had^has Stacey^would have Stacey|3|否定語句 Never before が強調のため文頭に出ているため、後ろは疑問文の語順〈has ＋ S(Stacey) ＋ p.p.(had)〉に倒置されます。|S2-neg|文頭の Never before に反応して、現在完了の助動詞 has を主語 Stacey の前に出せるかが勝負どころです。
+F1-32|倒置・強調・省略|c|こんな結末になろうとは，まったく夢にも思わなかった。\\nNever in my wildest dreams (   ) imagine that I would end up like this.|did I^had I^I did^I had|1|「夢にも〜なかった」を表す否定語句 Never in my wildest dreams が文頭にあるため、後ろは疑問文の語順になります。空所の後ろが原形 imagine なので、did I が正解です（had I なら後ろは過去分詞 imagined になります）。|S2-neg|倒置の語順（V＋S）だけでなく、直後の動詞が原形（imagine）であることから did I を選ばせる緻密な問題です。
+F1-33|倒置・強調・省略|c|その国では，1945年になってやっと女性が4年制大学に通うことが許された。\\nNot until 1945 (   ) to attend four-year colleges in that country.|did women allowed^no women allowed^were women allowed^women were not allowed|3|〈Not until A ＋疑問文語順（Aになって初めて〜した）〉の倒置構文です。「女性が許された（受動態）」なので、be動詞 were を主語 women の前に置いた were women allowed が正解です。|S2-neg|Not until が文頭に出たときの倒置ルールと、〈be allowed to V〉の受動態を同時に問う立命館大の頻出パターンです。
+F1-34|倒置・強調・省略|c|会議では，みんなが彼を支持しただけでなく，彼もまたみんなを支持した。\\nIn the meeting, not only did everyone support him, (   ) supported everyone.|but also they^but he did not^he also^they also|3|〈Not only ＋疑問文語順 (did everyone support him), (but) S also V〉の構文です。前半が「みんなが彼を支持した」なので、後半は「彼もまたみんなを支持した（he also supported everyone）」となります。|S2-neg|Not only 節の倒置構造と、文脈に合う主語（he）の選択を両方見ています。
+F1-35|倒置・強調・省略|c|私の祖父が建てたのはこの教会です。\\nIt is this church (   ) was built by my grandfather.|that^when^who^whom|1|主語 this church（物・単数）を It is と that の間に挟んだ強調構文です。人ではないので who / whom は使えず、that が正解です。|S2-cleft|強調構文の基本形〈It is [was] X that ...〉を正確に組み立てられるかを問うています。
+F1-36|倒置・強調・省略|c|1956年のオリンピック大会が開催されたのは，メルボルンだった。\\nIt was (   ) the 1956 Olympic Games were held.|in Melbourne that^Melbourne in where^that in Melbourne^in Melbourne which|1|元々の文 The 1956 Olympic Games were held in Melbourne. の場所を表す副詞句〈in Melbourne〉を It was と that の間に挟んで強調した形です。副詞句の強調には which は使えず that を用います。|S2-cleft|場所の強調だからといって前置詞 in を抜いたり、that の代わりに which を使う誤りを狙っています。
+F1-37|倒置・強調・省略|c|今は私の妻である女性と私が会ったのは大学でだった。\\n(   ) was at university that I met the woman who is now my wife.|I^She^It^What|3|副詞句 at university を強調する〈It was at university that ...〉の強調構文です。文頭には強調構文の形式的な It が入ります。|S2-cleft|後ろの that 節と呼応して強調構文を作る文頭の It を見抜けるかを問うています。
+F1-38|倒置・強調・省略|c|両親がノッティンガムに移ったのはアーサーが8歳の時で，そこではジョージおじさんがレース問屋をしていた。\\nIt was (   ) was eight that his parents moved to Nottingham, where his Uncle George had a lace warehouse.|Arthur^only Arthur^since Arthur^when Arthur|4|〈when Arthur was eight（アーサーが8歳のとき）〉という時の副詞節全体を It was と that の間に挟んで強調した構文です。|S2-cleft|単語や句だけでなく、when節という「副詞節」も強調構文で挟めるという盲点を突いた上智大の良問です。
+F1-39|倒置・強調・省略|c|いったい彼女はそこで何をしているのか。\\nWhat on (   ) is she doing there?|world^earth^ground^space|2|疑問詞の直後に〈on earth〉や〈in the world〉を置くと、「いったいぜんたい」と疑問詞を強める働きをします。前置詞が on なので earth が正解です（world なら in the world）。|S2-q|〈on earth〉と〈in the world〉の前置詞と名詞の組み合わせを混同させる定番問題です。
+F1-40|倒置・強調・省略|c|いったいなぜその鉄道事故は起こったのか。\\nWhy on (   ) did the railway accident happen?|earth^globe^the universe^the world|1|〈Why on earth ...?〉で「いったいなぜ〜なのか」と疑問詞を強調します。on the world とは言いません（in the world なら可）。|S2-q|on の後ろに the world を選ばせるひっかけです。無冠詞で on earth となる点を押さえましょう。
+F1-41|倒置・強調・省略|c|あなたはいったいどうやって台風の中をそこに到着したのですか。\\nHow (   ) did you get there in the typhoon?|never^on earth^on the world^the matter|2|疑問詞 How の直後に on earth を置いて「いったいどうやって」と強調しています。|S2-q|疑問詞強調のイディオム〈疑問詞＋on earth〉と、疑問文の語順（did you get there）の正確な構築を求めています。
+F1-42|倒置・強調・省略|c|ツトムは運転中に音楽を聴くのが好きだ。\\nTsutomu likes listening to music (   ) driving.|with^between^by^while|4|本来は while (he is) driving ですが、主節の主語（Tsutomu）と同一の主語＋be動詞（he is）が接続詞 while の直後で省略されています。|S2-omit|接続詞 while の後ろに主語＋be動詞が省略されて -ing が直接続く〈while doing（〜する間に）〉の頻出構造です。
+F1-43|倒置・強調・省略|c|私の母は車を運転している間はいつもラジオを聴く。\\nMy mother always listens to the radio (   ) driving the car.|how^where^why^while|4|while (she is) driving the car の she is が省略された形です。「〜している間」を表す接続詞 while を選びます。|S2-omit|疑問詞・関係副詞と接続詞 while を並べ、分詞 driving の前に置ける接続詞を選ばせる問題です。
+F1-44|倒置・強調・省略|c|アンは，朝食を作っていたとき，ナイフで指を切った。\\nAnn cut her finger with a knife (   ) breakfast.|by the time making^since making^until making^while making|4|「朝食を作っていた間に」は while (she was) making breakfast です。主語＋be動詞（she was）が省略されて while making となっています。|S2-omit|文脈（作業の最中に指を切った）と、副詞節内の S+be 省略のルールから while making を導かせます。
+F1-45|倒置・強調・省略|c|その作業は，適切に行われなければ，かなりの深刻な危険を引き起こすだろう。\\nThat operation will pose some serious risks (   ) done properly.|if any^if it^if not^if or not|3|本来は if (it is) not done properly（もしそれが適切に行われなければ）ですが、主節の主語 That operation を受ける it is が省略されて〈if not ＋過去分詞〉になっています。|S2-omit|〈if not ＋過去分詞（もし〜されなければ）〉という、条件節内での S+be 省略の超重要パターンを狙っています。
+F1-46|倒置・強調・省略|c|私の手紙を読んで，間違いがもしあれば訂正していただけませんか。\\nWould you read my letter and correct the mistakes, if (   )?|all^many^ever^any|4|if (there are) any (mistakes) の省略形で、〈if any〉は「もし（少しでも・何か）あれば」という意味の慣用表現です。|S2-omit|〈if any（もしあれば＝数・量）〉と〈if ever（もしそういうことがあるとしても＝頻度）〉の区別は入試の超定番です。
+F1-47|倒置・強調・省略|c|彼は国際政治には，たとえあるにしてもほとんど興味がなかった。\\nHe had little, if (   ), interest in international politics.|any^ever^none^some|1|if (he had) any (interest) の省略です。〈few / little, if any, ＋名詞〉で「たとえあるとしても、ほとんどない」と数量の少なさを補足・強調する挿入表現です。|S2-omit|little（量の少なさ）とセットになる挿入表現が if any であることを正確に記憶しているかを試しています。
+F1-48|倒置・強調・省略|c|サッチャー夫妻は，晩には，あるとしてもめったに外出しない。\\nMr. and Mrs. Thatcher seldom, if (   ), go out in the evening.|any^few^little^ever|4|頻度を表す否定語 seldom / rarely とセットで「たとえ（外出することが）あるとしても、めったにない」と挿入する場合は〈seldom, if ever〉を用います。|S2-omit|直前の問題（little, if any）と対をなす最重要知識です。「数・量なら if any、頻度（seldom）なら if ever」を見分ける問題です。
+F2-003|関係詞|c|彼はロシア語が話せないと言ったが，本当ではなかった。\\nHe said he couldn't speak Russian, (   ) was untrue.|which^what^why^how|1|カンマ＋which は、直前の名詞だけでなく「前の文の内容全体（彼はロシア語が話せないと言ったこと）」を先行詞にとることができます。|S3-non|カンマの後ろで前文全体を受ける関係代名詞は which のみ（that や what は不可）という鉄則を問うています。
+F2-005|関係詞|c|テストに受かるためにがんばって勉強しなければならない生徒がたくさんいる。\\nThere are a lot of students (   ) have to work hard to pass the test.|when^whose^who^which|3|先行詞が students（人）で、後ろに動詞 have to work hard が続いているため、主格の関係代名詞 who を選びます。|S3-chain|先行詞が「人」であり、節内で「主語」の働きをしていることを見抜く基本問題です。
+F2-007|関係詞|c|教授はその生徒に「私が講義で言及した部分を読みなさい」と厳しく言った。\\nThe professor sternly told the student, "Read the passage (   ) I referred in my lecture."|that^to that^to which^which|3|「〜に言及する」は自動詞＋前置詞の〈refer to A〉です。そのため単なる which ではなく、前置詞 to を伴った〈to which〉が必要です（前置詞の直後に that は置けません）。|S3-prep|refer が自動詞であり〈refer to the passage〉となる知識と、〈前置詞＋which〉の形を同時に問うセンター試験の名問です。
+F2-008|関係詞|c|これらは，彼が自分の家を建てるのに使った道具類です。\\nThese are the tools (   ) he built his own house.|that^with that^with which^which|3|後半の he built his own house はすでに SVO が揃った完全な文です。「その道具を使って（with the tools）」という意味をつなぐため〈with which〉となります。|S3-prep|後ろの文が SVO で完結していることに気づかせ、単なる which / that ではなく前置詞付きの with which を選ばせる問題です。
+F2-012|関係詞|c|子どもにはよくあることだが，フレッドは医師が到着するまでには回復してしまっていた。\\nAs is often the case (   ) children, Fred had recovered by the time the doctor arrived.|over^off^to^with|4|〈As is often the case with A（Aにはよくあることだが）〉は、主節全体を受ける関係代名詞 as を用いた超重要イディオムです。|S3-non|〈As is often the case with 〜〉の前置詞 with と語順を正確に覚えているかを試しています。
+F2-016|関係詞|c|定員がすでにいっぱいで，希望していた講座を履修できず残念だ。\\nIt's a pity that I can't take the course (   ) because it's already full.|that I want^which I wanted^I wanted to^wanted to it|3|the course (that) I wanted to (take) の構造です。want の目的語は the course ではなく to take the course なので、代不定詞の to を残した I wanted to が正解です。|S3-chain|which I wanted とすると want the course となり不自然になるため、to (take) の to が必要であることを見抜かせる良問です。
+F2-024|関係詞|c|消防士たちは家々が火事になっている通りに到達するのに苦労した。\\nThe firemen had trouble getting to the street (   ) the houses were on fire.|how^that^where^which|3|先行詞が the street（場所）で、後ろの the houses were on fire が欠けのない完全な文（「その通りで家々が燃えていた＝on the street」）なので、関係副詞 where が正解です。|S3-adv|先行詞が場所でも後ろが不完全文なら which、完全文なら where という関係詞の鉄則を問うています。
+F2-032|関係詞|c|スポーツの競技場にはよく特別なボックス席があるが，そこでは人々は飲食しながら試合を観戦することができる。\\nThere are often special box seats at sports stadiums, (   ) people can watch games with food and drinks.|where^wherever^which^whichever|1|カンマ＋where は「そしてそこでは（and there）」と先行詞（special box seats at sports stadiums）を補足説明します。後ろが SVO の完全文なので where が正解です。|S3-adv|カンマの後ろの文構造（people can watch games＝完全文）から、which ではなく関係副詞 where を選ばせる問題です。
+F2-037|関係詞|c|彼は2週間入院している。そういうわけで，彼は今日来ることができない。\\nHe has been in the hospital for two weeks. That's (   ) he can't come today.|because^how^why^the way|3|先行詞 the reason が省略された関係副詞 why です。〈That's why ＋結果（そういうわけで〜だ）〉と〈That's because ＋原因（というのは〜だからだ）〉の対比が重要です。|S3-adv|前文が「原因（入院している）」で、空所以下が「結果（今日来られない）」なので、because ではなく why を選ぶ論理問題です。
+F2-039|関係詞|c|私の友人のほとんどは，彼の絵が展示されている美術館へとすぐに行った。\\nMost of my friends immediately went to the museum (   ) his drawings were exhibited.|which^in which^to which^whose|2|「その美術館の中で彼の絵が展示されていた（his drawings were exhibited in the museum）」なので、前置詞 in を伴う〈in which〉（＝関係副詞 where）が正解です。|S3-prep|went to the museum の to に釣られて to which を選ばせる罠です。関係詞節内の動詞 were exhibited とのつながりを見るのがコツです。
+F2-051|関係詞|c|これは，あなたの助けなしでは私がその意味を理解できなかったことわざだ。\\nThis is a proverb (   ) meaning I couldn't understand without your help.|that^what^which^whose|4|先行詞が「物（a proverb）」であっても、所有格の関係代名詞 whose を使って〈whose meaning（そのことわざの意味）〉と無冠詞の名詞を直後に続けることができます。|S3-whose|「whose は人だけに使う」という誤解を突き、物の先行詞に対しても whose が使えることを問うています。
+F2-054|関係詞|c|きっと反対するだろうと私が思っていた男性からの反対意見はなかった。\\nThere was no objection from the man (   ) I thought was sure to protest.|of whom^on whom^who^by whom|3|節内の I thought は挿入節です。これを取り除くと〈the man who was sure to protest〉となり、was の主語となる「主格の関係代名詞 who」が必要だとわかります。|S3-chain|直後の I thought に惑わされて目的格 whom や前置詞＋whom を選ばせる、入試頻出の「挿入節トラップ」です。
+F2-055|関係詞|c|これは私が生まれた家だ。\\nThis is the house (   ) I was born.|which^in which^in that^what|2|I was born in the house. の in the house が関係代名詞になった形なので〈in which〉（＝where）が正解です。前置詞の直後に that は置けません（in that は「〜という点で」という接続詞）。|S3-prep|完全文 I was born の前に which 単体は置けないこと、および in which と in that の違いを問うています。
+F2-058|関係詞|c|彼は，私がその書名を思い出せないサリンジャーの小説の1冊について話した。\\nHe talked about one of Salinger's novels (   ) I can't remember the title.|which^whose^whatever^of which|4|I can't remember the title of the novel. の of the novel を関係代名詞にした形が〈of which〉です。後ろの名詞に定冠詞 the がついている（the title）ため、whose は使えず of which が正解です。|S3-whose|whose title（無冠詞）と of which ... the title（定冠詞つき）の決定的な違いを狙った難関大レベルの良問です。
+F2-060|関係詞|c|ツアーに参加したい人は午前8時に駅前に集合しなければならない。\\n(   ) wish to join the tour must gather in front of the station at 8:00 a.m.|Anybody^Everybody^Those who^Whoever|3|「〜する人々」は〈those who ＋複数動詞〉で表します。直後の動詞が三単現の -s のない wish なので、単数扱いの Whoever（なら wishes になる）は不可で、Those who が正解です。|S3-chain|Whoever と Those who を並べ、直後の動詞が wish（複数形）であることから Those who を特定させる鋭い問題です。
+F2-061|関係詞|c|あなたが子ども時代を過ごした家を覚えていますか。\\nDo you remember the house (   ) you spent your childhood years?|where^when^which^of which|1|spent の目的語は your childhood years（子ども時代）であり、you spent your childhood years (in the house) と SVO が揃った完全文なので、関係副詞 where が正解です。|S3-adv|「spend があるから目的語が欠けていて which だ！」と早合点する受験生を引っかける超有名トラップ問題です。
+F2-063|関係詞|c|それが，彼らがその市へ引っ越せなくなった理由だった。\\nThat was the reason (   ) stopped them from moving to the city.|which^for^because^why|1|先行詞が the reason でも、後ろが stopped them... と主語が欠けた不完全文になっているため、関係副詞 why ではなく主格の関係代名詞 which（または that）が正解です。|S3-adv|「the reason を見たら無条件で why」と暗記している生徒を見事に撃沈させる、文法の本質を問う名問です。
+F2-064|関係詞|c|彼は知らないふりをして，それで私はさらに腹が立った。\\nHe pretended ignorance, (   ) made me even angrier.|that^what^which^whichever|3|「彼が知らないふりをしたこと」という前文全体を受け、「そしてそのことが私をさらに怒らせた」と続ける非制限用法の〈, which〉です。|S3-non|カンマの後ろで前文全体を受ける関係代名詞 which と、第5文型〈make O C (even angrier)〉の組み合わせを問うています。
+F2-068|関係詞|c|あなたが下すどんな決定も，社長の承認が必要です。\\nAny decision (   ) need the president's approval.|you make will^that will be^will be made^you will make|1|Any decision (that) you make が主語全体で、その後ろに本動詞の will need が続きます。「あなたが下す決定」という制限節内では未来のことでも現在形 make を使います。|S3-chain|関係代名詞の目的格省略を見抜き、節内の動詞 make と主節の助動詞 will の境界線を正確に把握できるかを試しています。
+F2-075|関係詞|c|ジブリ美術館は私が訪れたい場所だ。\\nGhibli Museum is a place (   ) I want to visit.|where^to where^to which^which|4|先行詞が a place（場所）でも、後ろの visit は他動詞（「〜を訪れる」）で目的語が欠けているため、関係副詞 where ではなく目的格の関係代名詞 which が正解です。|S3-adv|「先行詞 a place ＝ where」という思い込みを突き、visit が他動詞であるため目的格の which になる点を見抜かせます。
+F2-076|関係詞|c|これは私たちが勉強したキャンパスです。その隣が，あなたが見たがっていたお寺です。\\nThis is the campus where we studied. Next to it is the temple (   ) you wanted to see.|that^what^whatever^whose|1|第2文は Next to it（副詞句）＋ is（V）＋ the temple（S）という第1文型の倒置文で、the temple を目的格の関係代名詞 which（または that）が修飾しています。|S3-chain|〈Next to it is the temple〉という倒置の語順と、see の目的語となる関係代名詞 which / that の接続を同時に問うています。
+F2-079|関係詞|c|それはナガノ氏が応募していた職だが，最終決定はまだなされていない。\\nThat is the position for (   ) Mr. Nagano has applied, but a final decision has not yet been made.|whom^which^that^what|2|「〜（職など）に応募する」は〈apply for the position〉です。前置詞 for が関係代名詞の前に出ているため、物の先行詞を受ける which を選びます（for that は不可）。|S3-prep|〈apply for 〜〉の熟語知識と、前置詞の直後には that や what は置けず which を置くという原則を問う早稲田大の問題です。
+F2-090|関係詞|c|日本では，人々はよく集団行動をとるが，このことを最もはっきり示すのは日本人が旅行するそのしかただ。\\nIn Japan, people often perform activities in groups, and nothing shows this more clearly than the way (   ) Japanese people travel.|that^which^in which^how|3|「〜する方法・やり方」は〈the way (that) S V〉または〈the way in which S V〉で表します（the way how と2つ並べるのは現代英語では不可）。|S3-prep|the way in which（または the way that）の語法と、〈nothing V 比較級 than A（Aほど〜なものはない）〉の最上級表現も同時に問う名問です。
+F2-091|関係詞|c|彼はそこで私を見たと言ったが，それはうそだった。\\nHe said that he saw me there, (   ) was a lie.|that^which^what^such|2|「彼がそこで私を見たと言ったこと」という前の文全体を先行詞にとる非制限用法の〈, which〉です。|S3-non|接続詞の that（said that...）と、非制限用法の関係代名詞 which（, which was a lie）の役割の違いを整理させます。
+F2-098|関係詞|c|私は先週ひいた風邪がまだ治っていない。\\nI still haven't recovered from the cold (   ) last week.|what I caught^I caught^in which I caught^why I caught|2|「風邪をひく」は〈catch a cold〉なので、caught の目的語が欠けています。目的格の関係代名詞 which / that が省略された〈the cold I caught〉が正解です。|S3-chain|〈recover from A（Aから回復する）〉と〈catch a cold（風邪をひく）〉の2つの語法と関係詞省略を組み合わせた実戦問題です。
+F2-100|関係詞|c|その事故を引き起こしたいくつかの要因について話そう。\\nLet's talk about some factors (   ) caused the accident.|those^what^where^that|4|先行詞 some factors（いくつかの要因）を、主格の関係代名詞 that が修飾して「その事故を引き起こした要因」となります。|S3-chain|先行詞が有り、後ろに動詞 caused が続く基本構造から主格の that を素早く選ぶ問題です。
+F2-106|関係詞|c|彼女は，あなたをとても助けてくれると私が信じる女性です。\\nShe is the woman (   ) I believe can help you a lot.|as^who^whom^which|2|I believe は挿入節です。これを取り除くと the woman ( ___ ) can help you a lot となり、助動詞 can の主語が欠けているため、主格の who が正解です。|S3-chain|直後の I believe の目的語だと勘違いして whom を選ばせる、入試で最も差がつく挿入節問題です。
+F2-114|関係詞|c|娘さんが弁護士になった先生のことを覚えていますか。\\nDo you remember the teacher (   ) daughter became an attorney?|so that^that his^which^whose|4|先行詞 the teacher と直後の無冠詞の名詞 daughter の間に「その先生の娘（his/her daughter）」という所有関係があるため、所有格の whose を用います。|S3-whose|空所の直後に無冠詞の単数可算名詞（daughter）が来ていることから、即座に所有格 whose を見抜く力を測っています。
+F2-121|関係詞|c|チャーリー・チャップリンは無声映画での彼の業績で最もよく知られた俳優だった。\\nCharlie Chaplin was an actor (   ) was best known for his work in silent movies.|who^which^whose^what|1|先行詞が an actor（人）で直後に動詞 was が続くため、主格の関係代名詞 who が正解です。〈be best known for 〜〉で「〜で最もよく知られている」を表します。|S3-chain|先行詞（人）＋主格の who と、熟語〈be known for A（業績・特徴で知られる）〉の定着を確認しています。
+F2-123|関係詞|c|意味をよく理解していない単語を使ってはいけません。\\nYou must not use the words (   ) meanings you don't understand well.|that^who^whose^which|3|you don't understand their meanings well の their meanings（それらの単語の意味）が〈whose meanings〉となって関係詞節の先頭に出た形です。|S3-whose|〈whose ＋名詞〉が関係詞節の中で「主語」だけでなく「understand の目的語」としても働くことを見抜けるかが狙いです。
+F2-127|what・複合関係詞|c|よくあることだが，ジョンは会議に遅刻した。\\n(   ) is often the case, John was late for the meeting.|As^When^Since^Why|1|後続の主節全体（ジョンが会議に遅刻したこと）を先行詞にとり、文頭に置くことができるのは関係代名詞 As だけです（which は前文しか受けられず文頭には置けません）。|S4-what|主節の前に置かれて主節全体を受ける関係代名詞 As の特徴と慣用句〈As is often the case〉を狙っています。
+F2-130|what・複合関係詞|c|ベル氏は私が情報を得た人物だ。\\nMr. Bell is the person (   ) I obtained the information.|for what^from whom^with whose^to who|2|「その人物から情報を得た（I obtained the information from the person）」なので、前置詞 from ＋目的格 whom の〈from whom〉が正解です。|S4-ever|動詞 obtain と結びつく前置詞 from と、前置詞の後ろでは who ではなく目的格 whom を使う規則を問うています。
+F2-133|what・複合関係詞|c|この前の冬に私は香港に行ったが，そこは私が思っていたほど暖かくなかった。\\nLast winter I went to Hong Kong, (   ) as warm as I had expected.|when wasn't^where it wasn't^where wasn't^which it wasn't|2|Hong Kong を受ける関係副詞〈, where（そしてそこでは）〉の後ろには完全な文が続くため、天候・気温を表す主語の it が必要となり〈where it wasn't〉が正解です。|S4-ever|where wasn't と主語 it を落としたり、which it wasn't と関係代名詞と代名詞を重複させる誤りを誘うセンター試験の名作です。
+F2-002|what・複合関係詞|c|どんなに社長ががんばっても，会社は最近の不景気のせいで破産するのではないかと私は思う。\\nI'm afraid that (   ) hard the president may try, the company will go bankrupt owing to the recent economic recession.|however^whatever^whichever^whoever|1|直後に副詞 hard があるため、形容詞・副詞を伴って「どんなに〜しても」を表す複合関係副詞 however（＝no matter how）が正解です。|S4-how|空所直後に形容詞・副詞（hard）があるときは whatever ではなく however / no matter how を選ぶ鉄則を問うています。
+F2-013|what・複合関係詞|c|どうぞお気軽にご連絡ください。喜んで私にできる手助けをさせていただきます。\\nPlease feel free to contact me. I'm willing to give you (   ) help I can.|that^which^whose^what|4|〈what ＋名詞＋ S + can [have]〉で「Sができる［持っている］限りの（すべての）〜」という意味を表す関係形容詞 what の重要構文です（I can の後ろには give が省略されています）。|S4-adj|直後に名詞 help があるため whose を選びたくなりますが、意味と構造（all the help that I can）から関係形容詞 what を見抜かせる難関大頻出問題です。
+F2-025|what・複合関係詞|c|ささやかながら，あなたの家族のお役に立てることは何でもしたい。\\nI'd like to do (   ) little service I can do for your family.|that^what^which^whose|2|〈what (little) ＋名詞＋ S + V〉で「（少ないながらも）Sが〜できる限りのすべての名詞」を表す関係形容詞 what の慣用表現です。|S4-adj|〈what little ＋不可算名詞〉の形で「なけなしの・ささやかながら精一杯の〜」を表すイディオム知識を問うています。
+F2-026|what・複合関係詞|c|事情は50年前とは大違いである。\\nThings are very different from (   ) they were fifty years ago.|that^what^which^however|2|〈what S is（現在のSの姿・状態）〉〈what S was/were（過去のSの姿・状態）〉は関係代名詞 what の超重要構文です。|S4-what|前置詞 from の目的語となり、かつ were の補語となる関係代名詞 what（過去の事情・状態）を狙っています。
+F2-033|what・複合関係詞|c|彼が私を今日の私にしてくれた。\\nHe's made me (   ) I am today.|that^what^when^which|2|〈make O C〉の補語 C の位置に〈what I am today（現在の私の姿・人格）〉が入った形です。先行詞を含み am の補語となる what が正解です。|S4-what|〈what I am（今の私）〉という関係代名詞 what の代表構文を〈make O C〉の中で使えるかを試しています。
+F2-034|what・複合関係詞|c|どんなに忙しくても，少なくとも6時間は眠るようにしなさい。\\n(   ) busy you are, never fail to sleep at least six hours.|However^Whoever^Whatever^Whenever|1|直後に形容詞 busy があるため、〈However ＋形容詞＋ S + V（どんなに〜でも）〉の語順を作る However が正解です。また〈never fail to V〉は「必ず〜せよ」という意味です。|S4-how|直後の形容詞 busy を修飾できるのは複合関係副詞 However だけである点と、語順（However busy you are）を狙っています。
+F2-036|what・複合関係詞|c|お米とアジア人の関係は，小麦とヨーロッパ人の関係と同じであるとよく言われる。\\nIt is often said that rice is to Asians (   ) wheat is to Europeans.|how^that^what^which|3|〈A is to B what C is to D〉で「AとBの関係は、CとDの関係と同じだ」を表す重要構文です（what の代わりに as を使うこともあります）。|S4-what|入試頻出の比較・比例構文〈A is to B what C is to D〉の接続語 what と語順を正確に再現できるかを問うています。
+F2-040|what・複合関係詞|c|どんなに健康に自信があっても，年に1度は健康診断を受けることがすすめられている。[Howeverパターン]\\n(   ) confident you are about your health, you are advised to have a medical check-up once a year.|However^Whatever^Whenever^Whoever|1|直後に形容詞 confident があるため、1語で「どんなに〜でも」を表す複合関係副詞〈However ＋形容詞＋ S + V〉となります（Step 16・40番／440番に対応）。|S4-how|直後の形容詞 confident の存在から、Whatever ではなく However を選ばせる問題です。
+F2-102|what・複合関係詞|c|どんなに健康に自信があっても，年に1度は健康診断を受けることがすすめられている。[No matter howパターン]\\n(   ) confident you are about your health, you are advised to have a medical check-up once a year.|No matter how^No matter what^No matter when^No matter which|1|〈However ＋形容詞＋ S + V〉を3語で書き換えた〈No matter how ＋形容詞＋ S + V〉の形です（Step 16・102番／237番に対応）。|S4-how|No matter what と No matter how を並べ、直後の形容詞 confident から No matter how を選ばせる問題です。
+F2-044|what・複合関係詞|c|ダイエットに関する新情報は私たちに，多くの人々が考えていることが誤りであることを示している。\\nNew information about diet shows us that (   ) many people think is incorrect.|what^how^why^when|1|shows us (O1) に続く O2 の名詞節を導くのが接続詞 that です。その that節の中で〈what many people think（多くの人が考えていること）〉が主語となり、is incorrect が述語になっています。|S4-what|that と what が連続する〈that [what many people think] is incorrect〉という二重の名詞節構造を見抜けるかを問うセンター試験の傑作問題です。
+F2-056|what・複合関係詞|c|時にはどんなにつらく思えても，あなたの勉強をやり続けなさい。\\nKeep on with your studies, (   ) hard it sometimes seems.|however^no matter what^so^whatever|1|seems の補語であった形容詞 hard が however の直後に引き寄せられた〈however hard it sometimes seems（時にはどんなにつらく思えても）〉の構文です。|S4-how|it sometimes seems hard の補語 hard が前に出ている構造を理解し、however を選べるかを問うています。
+F2-062|what・複合関係詞|c|彼は彼女が英語で言ったことがあまりわかっていなかったようだ。\\nIt seems that he did not understand (   ) she said in English well.|what^when^why^whatever|1|understand の目的語となり、かつ said の目的語にもなる先行詞を含む関係代名詞 what（彼女が言ったこと）が正解です。|S4-what|先行詞がなく、前後の動詞（understand と said）の両方の目的語を兼ねる what の基本機能を問うています。
+F2-070|what・複合関係詞|c|人前で話さなければならなかったときはいつでも，私は恐れですくんだ。\\n(   ) I had to speak in front of people, I was frozen with fear.|Whereas^Whoever^Whether^Whenever|4|「〜するときはいつでも（＝every time / at any time when）」と時を表す副詞節を導く複合関係副詞 Whenever が正解です。|S4-ever|文脈と後ろの完全文から、時の複合関係副詞 Whenever を選ばせる問題です。
+F2-074|what・複合関係詞|c|その学校は10年前とすっかり変わっている。\\nThe school is quite different from (   ) it was ten years ago.|which^that^as^what|4|〈what it was ＋過去の時〉で「過去のそれの姿・状態」を表します。前置詞 from の目的語かつ was の補語となる what が正解です。|S4-what|〈different from what S was〉の定番パターンを正確に使えるかを問うています。
+F2-080|what・複合関係詞|c|私たちの市は，今は20年前とはすっかり変わっている。\\nOur city is now very different from (   ) it was twenty years ago.|why^which^that^what|4|「20年前の私たちの市の姿」を〈what it was twenty years ago〉で表します。先行詞を含む関係代名詞 what の重要表現です。|S4-what|be動詞 was の後ろに補語が欠けていることに着目し、先行詞を含む what を選ぶ問題です。
+F2-082|what・複合関係詞|c|初めは簡単に思えたことが実は難しかったということはよくある。\\n(   ) seems easy at first often turns out to be difficult.|It^That^What^Which|3|〈What seems easy at first（最初は簡単に思えること）〉が文全体の主語になり、turns out to be difficult（実は難しいと判明する）が述語になっています。seems の主語が欠けているため What が正解です（That の後ろには完全文が必要）。|S4-what|文頭の名詞節で、直後にいきなり動詞 seems が来ている（＝主語が欠けている）ことから That ではなく What を選ばせる頻出問題です。
+F2-083|what・複合関係詞|c|あなたが決めることなら何にでも私は賛成します。\\nI will agree with (   ) you decide.|any what^whatever^ever what^anything how|2|前置詞 with の目的語となり、「〜するものは何でも（＝anything that）」という名詞節を導く複合関係代名詞 whatever が正解です。|S4-ever|前置詞 with の後ろで名詞節を作り、decide の目的語となる whatever の用法を問うています。
+F2-084|what・複合関係詞|c|トムは持っていた少ないながらもすべてのお金を失った。\\nTom lost (   ) little money he had.|whose^which^what^how|3|関係形容詞 what を用いた〈what little ＋不可算名詞＋ S + V〉で「少ないながらも持っていたすべての〜（なけなしの〜）」を表す超重要慣用表現です。|S4-adj|直後の little に釣られて how little（どれほど少ないか）を選ばせる巧妙な罠です。「なけなしの金」は what little money です。
+F2-087|what・複合関係詞|c|私たちはどんなに速く走っても9時の電車には間に合わないのではないかと思います。\\nI'm afraid we won't be in time for the 9:00 train (   ) how fast we run.|even if^as far as^no matter^as long as|3|空所の直後に how fast we run があるため、〈no matter how ＋副詞＋ S + V（どんなに〜しても）〉を作る no matter が正解です。|S4-how|後ろの how fast と結合して譲歩の副詞節を作る no matter を選ばせる問題です。
+F2-088|what・複合関係詞|c|その仕事がどんなに大変でも，私は全力を尽くします。\\nNo matter (   ) hard the task is, I'll do my best.|than^as^however^how|4|No matter の後ろには疑問詞（ここでは形容詞 hard を伴う how）を続けます。No matter however と重ねることはできません。|S4-how|No matter how と However を混同して No matter however と選んでしまうミスを狙っています。
+F2-089|what・複合関係詞|c|彼はどこに行ってもちやほやされる。\\nHe is made much of (   ) he goes.|wherever^however^whether^whichever|1|〈make much of A（Aを大事にする・ちやほやする）〉の受動態〈He is made much of〉に、「どこへ行っても」を表す複合関係副詞 wherever he goes が続いています。|S4-ever|群動詞〈make much of〉の受動態で of が残る形と、wherever he goes の接続を問う良問です。
+F2-097|what・複合関係詞|c|私の写真［絵］を，欲しい人ならだれにでもあげます。\\nI will give my picture to (   ) wants it.|whomever^whoever^anyone^no matter who|2|前置詞 to の目的語となるのは単語ではなく〈〜 wants it〉という節全体です。その節の中で動詞 wants の「主語」になっているため、whomever ではなく主格の whoever が正解です。|S4-ever|前置詞 to の直後だからと反射的に目的格 whomever を選ばせる、複合関係代名詞で最も引っかかりやすい問題です。
+F2-104|what・複合関係詞|c|サトウさんはいわゆる真のインテリだ。\\nMr. Sato is (   ) you call a true intellectual.|what^who^which^that|1|第5文型〈call O C〉の O が関係代名詞 what になった〈what you call C〉で「いわゆるC（あなたがCと呼ぶところのもの）」という慣用表現になります。|S4-what|先行詞が人（Mr. Sato）に見えるため who を選びたくなりますが、イディオム〈what you call（いわゆる）〉として what を選ぶ問題です。
+F2-108|what・複合関係詞|c|私たちがいつ友人の家に行っても，たくさんの食べ物でもてなしてくれる。\\n(   ) we go to our friend's house, they entertain us with a lot of food.|Wherever^Whoever^Whenever^Whichever|3|we go to our friend's house は場所（our friend's house）がすでに含まれた完全文なので Wherever ではなく、「〜するときはいつでも」を表す Whenever が正解です。|S4-ever|house があるからと Wherever を選ばせる罠です。すでに場所の目的語がある点に注目しましょう。
+F2-112|what・複合関係詞|c|ありがとう，ヒロミ。この本はまさに私が欲しかった本です。\\nThank you, Hiromi. This book is exactly (   ) I wanted.|what^which^of which^that|1|is の後ろに先行詞となる名詞がなく、副詞 exactly が直後の名詞節〈what I wanted（私が欲しかったもの）〉を強めています。|S4-what|副詞 exactly を先行詞と誤認せず、先行詞を含む関係代名詞 what を選ぶ基本かつ重要な問題です。
+F2-117|what・複合関係詞|c|自分が間違っていると信じることをするべきではない。\\nYou should not do (   ) you believe is wrong.|what^that^which^how|1|you believe は挿入節です。これを取り除くと〈You should not do what is wrong.（間違っていることをすべきではない）〉となり、先行詞を含み is の主語となる what が正解だとわかります。|S4-what|関係代名詞 what と連鎖関係代名詞（挿入節 you believe）が合体した応用問題です。
+F2-001|接続詞(基本)|c|この部屋では上着を脱ぎなさい，そうしないと汗をかきますよ。\\nTake off your coat in this room, (   ) you will sweat.|and^or^unless^so|2|命令文の後ろに〈, or S + V〉を続けると「〜しなさい、そうしないと（さもないと）…になる」を表します。|S5-imp|〈命令文, and 〜（そうすれば）〉と〈命令文, or 〜（さもないと）〉を文脈（汗をかく）から判断させる問題です。
+F2-006|接続詞(基本)|c|この女性がレースに勝つだろうということは間違いない。\\nThere's no doubt (   ) this woman is going to win the race.|about^for^what^that|4|名詞 no doubt（疑いがないこと）の具体的な内容を説明する「同格の接続詞 that」です。後ろが完全な文なので what は不可です。|S5-that|〈There is no doubt that S + V（SがVすることは疑いない）〉の重要構文を問うています。
+F2-009|接続詞(基本)|c|その知らせに，彼女はあまりにもショックを受けたので，もう少しで気絶するところだった。\\nThe news gave her (   ) a shock that she nearly fainted.|so^such^very^too|2|空所の後ろが〈a shock〉という名詞句になっているため、形容詞の such を用いて〈such a shock that ...（あまりに大きなショックだったので〜）〉とします。|S5-so|so と such の使い分け（直後が a ＋単数可算名詞なら such）を問う入試超頻出問題です。
+F2-014|接続詞(基本)|c|彼らが帰ったらすぐ連絡してほしいと彼女は私に依頼した。\\nShe asked me to contact her (   ) they returned.|directly^hardly^the moment^the instance|3|〈the moment [the instant] S + V〉で「SがVするとすぐに（＝as soon as S + V）」という時の副詞節を導きます（instance は「例」という意味で、瞬間は instant です）。|S5-time|〈the moment S + V〉の知識と、似た単語 the instance（例）とのひっかけを見抜けるかを試しています。
+F2-015|接続詞(基本)|c|マイクはコーヒーも紅茶も好きではない。\\nMike likes (   ) coffee nor tea.|both^either^neither^not|3|後ろの nor tea と呼応して「AもBも〜ない」を表す〈neither A nor B〉を作ります。|S5-imp|nor とペアを組む相関接続詞 neither を正確に選ぶ基本問題です。
+F2-019|接続詞(基本)|c|そのプロジェクトを終えるのにたったの3か月しかかからなかったことは，驚くべき偉業だ。\\n(   ) it took only three months to finish the project is an amazing achievement.|While^If^What^That|4|it took only three months to finish the project は欠けのない完全な文です。完全文を束ねて「〜ということは」と文全体の主語（単数扱い・動詞は is）にする接続詞 That が正解です。|S5-that|文頭の名詞節で、後ろが完全文なら That、不完全文なら What という識別ルールを問うています。
+F2-020|接続詞(基本)|c|あなたは急いだほうがいい，さもないとそこには間に合わないだろう。\\nYou had better hurry up, (   ) you will not be there in time.|and^or^till^when|2|命令文と同じく、助言を表す〈You had better V（〜した方がいい）〉の後ろに〈, or ...〉を続けると「さもないと…になる」という意味になります。|S5-imp|had better による強い助言の文が、命令文＋or と同じ働きをすることをつかめているかが狙いです。
+F2-021|接続詞(基本)|c|そのショッピングセンターはとても大きかったので，人々が出口を見つけられないということがよくあった。\\nThe shopping center was (   ) huge that people often couldn't find the exit.|very^much^so^as|3|形容詞 huge のみを挟んで後ろの that 節（結果）と呼応するため、副詞 so を用いた〈so huge that ...〉が正解です（very huge that とは言えません）。|S5-so|日本語の「とても〜なので…」に釣られて very を選ばせず、that節と呼応する相関語 so を選ばせる問題です。
+F2-023|接続詞(基本)|c|彼女があなたを信じているということは，信じがたい。\\n(   ) she believes you is hard to believe.|What^That^Whatever^Whenever|2|she believes you は SVO が揃った完全文なので、それを名詞節にして「彼女があなたを信じているということは」と主語にする接続詞 That が正解です。|S5-that|短い文の中に believes と to believe が並び、かつ文頭が完全文であることから What ではなく That を選ばせる良問です。
+F2-027|接続詞(基本)|c|今やその国には新しい民主主義政府があるので，その国民はついに，さらなる自由を手にすることだろう。\\n(   ) the country has a new democratic government, the people will at last have more freedom.|Although^Even if^In the event that^Now that|4|〈Now (that) S + V〉で「今やSがVしたからには・〜なので」と、新しい状況が生じたことを理由として述べる群接続詞です。|S5-that|文脈（新政府ができた→自由を手にする）から、逆接ではなく理由を表す〈Now that〉を選ばせる問題です。
+F2-029|接続詞(基本)|c|とても天気のよい日だったので，彼らはハイキングに出かけた。\\nIt was (   ) a fine day that they went hiking.|such^so^what^then|1|空所の後ろが〈a fine day〉という「冠詞＋形容詞＋名詞」の語順なので、〈such a fine day that ...〉となります（so を使うなら so fine a day）。|S5-so|〈such a 形 名 that〉と〈so 形 a 名 that〉の語順の鉄則を問うています。
+F2-030|接続詞(基本)|c|ロバートは，そのホールの中にいる全員に聞こえるように，大きな声で結婚式のスピーチをしました。\\nRobert made a (   ) speech at the wedding so that all the people in the hall could hear him.|choking^hoarse^loud^low|3|〈so that S + could hear him（全員に彼の声が聞こえるように）〉という目的の副詞節に合わせて、形容詞は loud（大きな声の）となります。|S5-purp|目的構文〈so that S + could V〉の組み立てと、文脈に合う形容詞 loud の選択を問うています。
+F2-035|接続詞(基本)|c|その女性は年をとるにつれて，より美しくなった。\\nThe woman became more beautiful (   ) she got older.|as^before^from^if|1|主節と従属節に比較級（more beautiful / older）を伴い、「〜するにつれて」という比例・同時進行を表す接続詞 as です。|S5-time|2つの変化が同時に進む「〜するにつれて」の as を正確に選べるかを見ています。
+F2-038|接続詞(基本)|c|私が彼に話しかけるやいなや，彼は行ってしまった。\\nHardly (   ) to him before he was gone.|had I spoken^I have spoken^I spoke^I was spoken|1|「〜するやいなや」を表す〈Hardly [Scarcely] had S + p.p. before [when] S' + V'〉の構文です。否定の副詞 Hardly が文頭に出ているため、〈had I spoken〉と過去完了が疑問文語順に倒置されます。|S5-time|「過去完了時制（had spoken）」「文頭否定語による倒置（had I spoken）」「接続詞 before/when」の3大要素を問う最重要構文です。
+F2-041|接続詞(基本)|c|海外旅行は多くの人にとってわくわくするものだ。けれども，自分の国をとても恋しがってホームシックになる人も少しはいる。\\nThere are, however, a few who miss their own countries (   ) that they become homesick.|so^such^so many^so much|4|動詞 miss（恋しがる）の程度を修飾して「とても恋しがるので〜だ」とするため、単なる so ではなく副詞句の〈so much〉を用いて〈miss ... so much that S + V〉とします。|S5-so|形容詞や副詞がない動詞（miss）の後ろでは、単なる so ではなく〈so much that〉にしなければならないという盲点を突いた良問です。
+F2-046|接続詞(基本)|c|ある男性が私の隣に住んでいるという事実が，彼は私の友人であるということを意味するわけではない。\\nThe fact (   ) a man lives next door to me does not mean he is my friend.|if^of^that^which|3|a man lives next door to me は第1文型の完全な文です。抽象名詞 The fact の中身を説明する「同格の接続詞 that」を選びます（関係代名詞 which は不可）。|S5-that|先行詞があるように見えるため which を選びたくなりますが、後ろが完全文なので同格の that になるという頻出識別問題です。
+F2-047|接続詞(基本)|c|私は夏の別荘を建てるためにその土地を買った。\\nI bought the land (   ) I could build a summer house.|as^so that^that^whether|2|「〜するために」という目的の副詞節を導く〈so that S + can/could/may/might V〉の基本構文です。|S5-purp|後ろの助動詞 could と呼応して目的を表す群接続詞 so that を選ばせる問題です。
+F2-052|接続詞(基本)|c|シェイクスピアは，作家であっただけではなく，俳優でもあった。\\nShakespeare was not only a writer (   ) also an actor.|but^again^even^ever|1|〈not only A but (also) B〉で「AだけでなくBも」を表します。|S5-imp|相関表現の基本である not only 〜 but also ... の正確な語順を確認しています。
+F2-059|接続詞(基本)|c|私が電車に足を踏み入れるやいなや，ドアが閉まった。\\nI had no sooner stepped into the train (   ) the door closed.|and^as^than^that|3|「〜するやいなや」を表す〈S + had no sooner + p.p. than S' + V'〉の構文です。比較級 no sooner と呼応するため接続詞は than になります。|S5-time|〈hardly ... when/before〉と〈no sooner ... than〉のペアの混同（no sooner に when を使ってしまう等）を狙っています。
+F2-065|接続詞(基本)|c|ケイコはとても親切な女の子なので，だれもが彼女のことが好きだ。\\nKeiko is such a nice girl (   ) everyone likes her.|how^that^who^why|2|前の such a nice girl と呼応して「とても〜なので…だ」と結果の副詞節を導く接続詞 that です。|S5-so|直前に a nice girl（人）があるため、関係代名詞 who を選ばせる罠が仕掛けられています。後ろが everyone likes her と完全文であり、前の such と呼応する that を見抜く良問です。
+F2-066|接続詞(基本)|c|事故が少なくなるように，新しい交通安全の法律が導入された。\\nNew traffic safety laws were introduced (   ) there would be fewer accidents.|so that^as if^in case^just as|1|「事故がより少なくなるように」という目的を表す〈so that S + would V〉の構文です。|S5-purp|後ろの助動詞 would と文脈から、目的の接続詞 so that（in case なら「事故が減るといけないから」と逆の意味になる）を選ばせます。
+F2-069|接続詞(基本)|c|ある人の幼少時代の経験は，その人が大人としてどうふるまうかに影響を与えると信じる心理学者もいる。\\nSome psychologists believe (   ) a person's early childhood experiences affect how he or she behaves as an adult.|if^so^that^what|3|believe の目的語となる名詞節を導く接続詞 that です。節内は a person's early childhood experiences (S) ＋ affect (V) ＋ how... (O) と完全な文になっています。|S5-that|長文構造の中で、believe の目的語節を導く接続詞 that と、節内の主語・本動詞 affect を正しく組み立てさせる問題です。
+F2-072|接続詞(基本)|c|彼女はみんなが読めるように自分の詩を出版したいと思った。\\nShe wanted to publish her poetry (   ) everyone could read it.|in that^so much^so that^that which|3|「誰もがそれを読めるように」という目的を表す〈so that S + could V〉の構文です。|S5-purp|in that（〜という点で）などの紛らわしい選択肢から、目的を表す so that を選ばせる問題です。
+F2-081|接続詞(基本)|c|地震があるたびに，より多くの人が自然とはなんと力強いものかと知るようになるだろうと私は思う。\\nI think that (   ) there is an earthquake, more people will come to realize how powerful nature is.|even if^every^every time^every other|3|〈every time [each time] S + V〉は、それ自体が接続詞のように働いて「SがVするたびに（＝whenever S + V）」という時の副詞節を導きます（every 単体では接続詞になれません）。|S5-time|every 単体と every time（接続詞機能）の文法的な違いを問うセンター試験の頻出問題です。
+F2-095|接続詞(基本)|c|彼女が後ろを向くとすぐに，その男の子はクッキーの入ったビンに手を伸ばした。\\nHardly (   ) her back when the boy reached for the cookie jar.|she had turned^had she turned^did she turn^she turned|2|「彼女が後ろを向くやいなや」を表す〈Hardly had S + p.p. when S' + V'〉の倒置構文です。文頭の Hardly により過去完了が〈had she turned〉と倒置されます。|S5-time|過去形 did she turn ではなく、過去完了の倒置形〈had she turned〉を選ばせる関西学院大の定番問題です。
+F2-096|接続詞(基本)|c|太陽が東から昇るので，日本は長い間「日出づる国」と呼ばれてきた。\\n(   ) the sun rises in the east, Japan has long been called "the land of the rising sun."|Since^If^When^For|1|相手も知っている周知の理由（「〜なので」）を文頭で述べる接続詞 Since です（等位接続詞の for も「というのは〜だから」を表しますが、文頭には置けません）。|S5-that|理由を表す Since と For の位置ルール（文頭に置けるのは Since）および主節との論理関係を問うています。
+F2-099|接続詞(基本)|c|今日はとても天気のよい日なので，私たちは外に出かけるべきだ。\\nIt's (   ) day today that we should go outside.|such beautiful^so beautiful^so beautiful a^a so beautiful|3|単数可算名詞 day があるため冠詞 a が必須です。so を用いる場合は〈so ＋形容詞(beautiful)＋ a ＋名詞(day)〉の語順になります（such なら such a beautiful day）。|S5-so|〈so 形 a 名〉の語順と、単数可算名詞 day に冠詞 a が抜けてはいけない点を突いた青山学院大の頻出問題です。
+F2-101|接続詞(基本)|c|消費者は使うお金を少なくしたいので，ふつう，商品の値段が下がるほどさらにそれを買いたい気持ちになる。\\nConsumers are usually willing to buy more of an item as its price falls (   ) they want to spend less money.|because^because of^though^unless|1|「価格が下がるにつれて（as its price falls）」「より少ないお金を使いたいので（because they want to spend less money）」と2つの接続詞が続きます。後ろが SV の節なので前置詞句 because of ではなく接続詞 because が正解です。|S5-time|接続詞 because（＋SV）と群前置詞 because of（＋名詞句）の区別、および比例の as の構築を問うています。
+F2-103|接続詞(基本)|c|私は猫よりも犬のほうが従順だという点で好きだ。\\nI like dogs better than cats in (   ) they are more obedient.|which^what^that^whom|3|「前置詞の直後に関係代名詞 that は置けない」という原則の重要な例外として、接続詞の〈in that S + V（SがVだという点で・〜だから）〉があります。|S5-imp|「in の後ろだから that はダメで which だ！」と機械的に考える受験生を逆手に取った、群接続詞〈in that〉の超定番問題です。
+F2-105|接続詞(基本)|c|自分がどのような仕事に向いているかがわかるまでに，ずいぶん時間がかかった。\\nIt was a long time (   ) I realized what sort of job would be suitable for me.|after^before^during^while|2|〈It was ＋時間＋ before S + V〉で「SがVするまでに（長い）時間がかかった／しばらくしてやっとSがVした」を表す重要構文です。|S5-time|日本語の「〜してから」に釣られて after を選ばせず、〈It is [was] ... before 〜〉の構文知識を問うています。
+F2-107|接続詞(基本)|c|世界の多くの人々が耐えられない貧困の中で暮らしているという事実は，我々みんなの関心事であるべきだ。\\nThe fact (   ) many people in the world live in intolerable poverty must concern all of us.|that^which^in which^where|1|many people in the world live in intolerable poverty は第1文型の完全な文です。The fact の具体的内容を示す同格の接続詞 that が正解です。|S5-that|The fact の後ろが完全文であることから、関係詞（which / where）ではなく同格の接続詞 that を選ばせる問題です。
+F2-109|接続詞(条件・譲歩)|c|彼は運転免許証もクレジットカードも持っていなかった。\\nHe had neither his driver's license (   ) his credit card with him.|and^but^nor^or|3|〈neither A nor B（AもBも〜ない）〉の構文です。either A or B と混同して neither ... or にしないよう注意が必要です。|S6-cond|neither と呼応する接続詞として or ではなく nor を正確に選べるかを問うています。
+F2-115|接続詞(条件・譲歩)|c|急ぎなさい，そうすれば彼に追いつくことができるでしょう。\\nHurry up, (   ) you'll be able to catch up with him.|otherwise^but^and^or|3|命令文 Hurry up の後ろに〈, and S + V〉を続けて「急ぎなさい、そうすれば追いつけるだろう」を表します。|S6-cond|文脈（追いつくことができる＝望ましい結果）から、or ではなく and を選ぶ問題です。
+F2-118|接続詞(条件・譲歩)|c|彼の両親は，冬が寒すぎたので，国の暖かい地方に引っ越した。\\nHis parents moved to the warmer part of the country (   ) the winters were too cold for them.|since^and^due to^unless|1|後ろに the winters were too cold for them という SV の節が続き、「冬が寒すぎたので」という理由を表すため、接続詞の since が正解です（due to は前置詞句なので後ろに節は置けません）。|S6-cond|意味が同じ「〜のために」でも、後ろが節（SV）なので群前置詞 due to ではなく接続詞 since を選ぶ品詞識別問題です。
+F2-120|接続詞(条件・譲歩)|c|スズキ氏の講演は，興味深いだけではなく，やる気にさせるものでもある。\\nMr. Suzuki's lectures are not only interesting (   ) also motivating.|and^but^either^or|2|形容詞 interesting と motivating を〈not only A but also B〉で対等に結んでいます。|S6-cond|相関接続詞 not only 〜 but also ... の基本構造を確認しています。
+F2-131|接続詞(条件・譲歩)|c|宿題を終えるまで今夜は眠らないつもりだ。\\nI'm not going to sleep tonight (   ) I finish my homework.|by^during^until^since|3|「…するまで〜しない」は継続の接続詞 until を使います（by と during は前置詞なので後ろに節は不可）。また時の副詞節内なので未来のことでも現在形 finish を用います。|S6-cond|前置詞（by / during）と接続詞（until）の区別、および時の副詞節内の現在形を問うています。
+F2-134|接続詞(条件・譲歩)|c|彼女は私がこれまでに会った中で最もロマンチックな女性だ。私が彼女を見た瞬間に，彼女は私の心を捕らえた。\\nShe is the most romantic woman I've ever met. (   ) I saw her, she captured my heart.|The moment^In case^Either^Though|1|〈The moment S + V〉が接続詞として働き、「私が彼女を見た瞬間に（＝As soon as I saw her）」を表します。|S6-cond|名詞句 The moment が接続詞として節を導く用法を知っているかを試しています。
+F2-004|接続詞(条件・譲歩)|c|私が知る限りでは，彼女はもうそこで働いていない。\\nAs (   ) as I know, she no longer works there.|far^little^long^much|1|「〜する範囲では・〜する限りでは」と知識や視覚などの範囲を表すときは〈as far as〉を用います。〈as far as I know〉で「私の知る限りでは」です。|S6-cond|〈as far as（範囲：〜する限り）〉と〈as long as（条件・期間：〜しさえすれば）〉の超重要識別問題です。
+F2-010|接続詞(条件・譲歩)|c|夜に寒くなるといけないから，このセーターを持って行きなさい。\\nTake this sweater with you in (   ) it should get cold in the evening.|brief^case^example^that|2|「万一〜するといけないから・〜する場合に備えて」は群接続詞〈in case S + (should) V〉で表します。|S6-case|万一の事態への備えを表す〈in case〉と、節内で助動詞 should がよく使われる語法を問うています。
+F2-011|接続詞(条件・譲歩)|c|あなたがすぐ返してくれるなら，その本をお貸しするのはかまいませんよ。\\nI don't mind lending you the book (   ) you give it back soon.|provided^supposed^unless^which|1|分詞由来の接続詞〈provided (that) S + V〉または〈providing (that) S + V〉で「もしSがVならば（＝if）」という条件を表します（supposing は現在分詞形なら可ですが過去分詞 supposed 単体では不可）。|S6-cond|provided（条件の接続詞）と supposed（単体では不可、supposing なら可）の正確な語法知識を問う近畿大の良問です。
+F2-017|接続詞(条件・譲歩)|c|水が冷たいにもかかわらず，少年たちは池に飛び込んだ。\\nCold (   ) the water was, the boys jumped into the pond.|as^as if^even if^like|1|本来は Though the water was cold ですが、補語の形容詞 Cold を文頭に出し、接続詞 as（または though）を用いた〈形容詞＋ as ＋ S + V〉で「〜だけれども」という譲歩を表します。|S6-conc|文頭に形容詞 Cold が飛び出している特殊語順から、譲歩の as を見抜かせる入試頻出の重要構文です。
+F2-018|接続詞(条件・譲歩)|c|ただおもしろければどんな本でもかまわない。\\nAny book will do (   ) it is interesting.|as long as^as far as^as much as^as well as|1|「〜しさえすれば・〜である限りは（＝only if）」という条件を表す群接続詞〈as long as〉です。また自動詞 do は「間に合う・役に立つ（かまわない）」という意味です。|S6-cond|条件の〈as long as〉と範囲の〈as far as〉の使い分け、および自動詞 do（間に合う）の語法を問うています。
+F2-022|接続詞(条件・譲歩)|c|もっと一生懸命勉強しなければ，あなたは試験に合格しないだろう。\\n(   ) you study much harder, you won't pass the exam.|Unless^If^In case^Since|1|「もしあなたがもっと一生懸命勉強しなければ（＝If you don't study much harder）」を表す接続詞 Unless です。|S6-cond|主節（合格しないだろう）との論理関係から、肯定条件の If ではなく否定条件の Unless を選ばせる問題です。
+F2-028|接続詞(条件・譲歩)|c|もっと速く運転するのでなければ，コンサートに遅れるだろう。\\n(   ) you drive faster, you will be late for the concert.|Since^Though^Unless^While|3|Drive faster, or you will be late... と同意の〈Unless you drive faster（もっと速く運転しない限り）〉です。|S6-cond|〈命令文, or ...〉と〈Unless S + V, ...〉の書き換えおよび論理関係を問うています。
+F2-031|接続詞(条件・譲歩)|c|電車に乗りそこねてしまったら，私たちはどうしよう。\\n(   ) we miss the train, what shall we do?|Having^Looking^Being^Supposing|4|分詞由来の接続詞〈Supposing (that) S + V〉で「もし〜なら（＝If）」を表し、特に主節が疑問文（what shall we do?）のときによく使われます。|S6-cond|分詞構文ではなく、条件の接続詞として確立している Supposing の語法を狙っています。
+F2-042|接続詞(条件・譲歩)|c|ケンは早朝のどが痛く熱があったけれども，朝食後学校へ向かった。\\n(   ) Ken had a sore throat and a fever early in the morning, he left for school after he had breakfast.|As^However^If^Though|4|「のどが痛く熱があったけれども学校へ向かった」という逆接・譲歩の副詞節を導く接続詞 Though（または Even though）が正解です（However は副詞なので SV の節を直接導けません）。|S6-conc|接続詞 Though / Even though と副詞 However の品詞・文法的働きの違いを問うています。
+F2-045|接続詞(条件・譲歩)|c|私の知る限りでは，出荷品は来週届くだろう。\\nThe shipment will arrive next week as (   ) as I know.|far^little^often^soon|1|知識の及ぶ範囲を表す〈as far as I know〉です。文末に置かれることもよくあります。|S6-cond|定型表現〈as far as I know〉を文末でも正確に構成できるかを確認しています。
+F2-050|接続詞(条件・譲歩)|c|土曜日の朝働くという条件で，あなたに休暇を与えよう。\\nI'll give you the day off on (   ) that you work on Saturday morning.|condition^exchange^promise^terms|1|〈on condition that S + V〉で「SがVするという条件で」を表す群接続詞です。条件の副詞節なので未来のことでも現在形 work を使います。|S6-cond|〈on condition that S + V〉の正確な名詞選択（condition）と語順を問う津田塾大の問題です。
+F2-053|接続詞(条件・譲歩)|c|明日電車が満席だといけないから，今日席を予約するほうがよい。\\nI had better reserve a seat today (   ) the train is full tomorrow.|as if^even if^in case^even though|3|「明日電車が満席の場合に備えて（満席だといけないから）」を表す群接続詞〈in case〉です。副詞節内なので tomorrow があっても現在形 is を使います。|S6-case|even if（たとえ〜でも）と in case（〜するといけないから）の意味の違いを文脈から判断させる良問です。
+F2-071|接続詞(条件・譲歩)|c|たとえあなたがだれと話しているかわかっているとしても，電話でだれかに自分のクレジットカードの番号を言わないことが大切だ。\\nIt is important not to give out your credit card number to anyone over the phone (   ) you know who you are talking to.|so that^even if^but^or|2|「たとえ相手が誰かわかっていても」という仮定・譲歩を表す群接続詞〈even if〉です。また形式主語構文〈It is important not to V〉の形も重要です。|S6-conc|不定詞の否定形〈not to give out〉の語順と、譲歩の〈even if〉を正確に組み立てる力を問うています。
+F2-077|接続詞(条件・譲歩)|c|メアリーが本当にそのお金を盗んだのかどうかははっきりしない。\\n(   ) Mary actually stole the money or not is unclear.|If^How^What^Whether|4|「〜かどうか」という名詞節が文頭で「文全体の主語」になる場合、Whether は使えますが If は使えません。|S6-conc|「〜かどうか＝if / whether」と覚えている受験生に対し、文頭の主語節には Whether しか使えないという重要ルールを問う青山学院大の頻出問題です。
+F2-085|接続詞(条件・譲歩)|c|母が私の大好物を作ってくれたのに，今朝は朝食を食べる時間がなかった。\\nI didn't have time to eat breakfast this morning (   ) my mother cooked my favorite dish.|since^even though^given that^regardless|2|「母が大好物を作ってくれた（事実）にもかかわらず、食べる時間がなかった」という逆接を表す〈even though〉が正解です。|S6-conc|文脈から逆接関係を把握し、後ろに節をとれる接続詞 even though（regardless は副詞/regardless of 名詞）を選ばせます。
+F2-086|接続詞(条件・譲歩)|c|そのパンクしたタイヤを修理してもらうまで，あなたは車を運転できないだろう。\\nYou won't be able to drive your car (   ) you get that flat tire fixed.|until^after^since^during|1|「タイヤを修理してもらうまでは運転できない（修理して初めて運転できる）」という〈not ... until S + V〉と、〈get + O (that flat tire) + p.p. (fixed)〉の重要表現が組み合わさっています。|S6-cond|〈not ... until〉の接続詞選択と、第5文型〈get that flat tire fixed〉の語順を同時に見る良問です。
+F2-092|接続詞(条件・譲歩)|c|今年は東京でたくさんの約束があったので，計画していたようにアメリカに行かずに，春の大半をそこで過ごした。\\nThis year I had so many commitments in Tokyo that I spent most of the spring there, instead of going to America (   ) I had planned.|as^if^since^that|1|〈as I had planned〉で「私が計画していた通りに（ように）」という様態を表す接続詞 as です。|S6-conc|群前置詞〈instead of doing〉と、様態の接続詞〈as I had planned〉の組み合わせを問うています。
+F2-110|接続詞(条件・譲歩)|c|夕食に間に合って帰宅するのなら，買い物に行ってもいいですよ。\\nYou can go shopping, as (   ) as you come home in time for dinner.|far^long^much^well|2|「夕食に間に合って帰ってきさえすれば（条件）」を表すので〈as long as〉が正解です。|S6-cond|条件を表す場面で as far as ではなく as long as を確実に選べるかを問う学習院大の頻出問題です。
+F2-113|接続詞(条件・譲歩)|c|遅い時間だったけれども，私たちは友人たちを訪ねることに決めた。\\nLate (   ) it was, we decided to visit our friends.|as^on^but^even|1|Though it was late の補語 Late を文頭に出した〈Late as it was（遅い時間だったけれども）〉という譲歩の倒置構文です。|S6-conc|文頭の形容詞 Late の直後に置かれて譲歩を表す接続詞 as を見抜かせる問題です。
+F2-116|接続詞(条件・譲歩)|c|美しい女性だけれども，メアリーはとても謙虚である。\\n(   ) she is, Mary is very humble.|A beautiful woman though^Beautiful as^Beautifully woman as^As beautiful so|2|〈形容詞(Beautiful)＋ as ＋ S + V〉で「彼女は美しいけれども」を表します（名詞を前に出す場合は無冠詞で Woman as she is とするため、A beautiful woman though は誤りです）。|S6-conc|譲歩の倒置構文〈形容詞＋ as ＋ S + V〉の正確な形と、冠詞付きの単数名詞は前に出せないという細かいルールまで突いた良問です。
+F2-122|接続詞(条件・譲歩)|c|それが本当かどうかはあまり重要にはならないだろう。\\nWhether (   ) not matter much.|is it true or not does^it is true or not will^or not true will be^true or not is|2|〈Whether it is true or not（それが本当かどうか）〉という平叙文語順の名詞節全体が主語になり、その後に助動詞＋動詞の〈will not matter much〉が続きます。|S6-conc|名詞節内の語順（疑問文語順 is it ではなく平叙文語順 it is）と、文全体の本動詞 will not matter のつながりを問うています。
+F2-125|接続詞(条件・譲歩)|c|ヘレンは疲れすぎていなければ，毎朝ジョギングをする。\\nHelen jogs every morning (   ) she is too tired.|despite^without^whether^unless|4|「疲れすぎていない限りは（疲れすぎていなければ）」という否定の条件を表す接続詞 unless です（despite や without は前置詞なので後ろに節は不可）。|S6-cond|前置詞（despite / without）を排除し、文脈に合う接続詞 unless を選ぶ問題です。
+F2-126|接続詞(条件・譲歩)|c|彼女にはたくさん宿題があるけれども，今夜は遅くまで起きてテレビを見るつもりだ。\\n(   ) she has a lot of homework, she is going to stay up late watching TV tonight.|In spite of^Even though^Therefore^However|2|後ろに she has a lot of homework という SV の節が続いているため、群前置詞 In spite of や副詞 However ではなく、接続詞の Even though が正解です。|S6-conc|入試で最もよく出る「Even though（接続詞＋SV）vs. In spite of（群前置詞＋名詞）vs. However（副詞）」の品詞識別問題です。
+F2-128|接続詞(条件・譲歩)|c|多くの日本人は英語がよくわかっていても外国人に話しかけるのをためらう。\\nMany Japanese people are hesitant to speak to foreigners (   ) they know English well.|as^even^even if^as to|3|「たとえ英語がよくわかっていても」を表す群接続詞〈even if〉です（even 単体は副詞なので接続詞にはなれません）。|S6-conc|副詞 even 単体では節をつなげないため、接続詞 if を伴った even if を選ばせる問題です。
+F2-135|接続詞(条件・譲歩)|c|忘れるといけないからパスワードを書き留めておきなさい。\\nWrite down your password (   ) you should forget it.|in case^in order that^so that^unless|1|後ろが you should forget it（忘れてしまう）という避けたい事態なので、目的の so that / in order that ではなく、万一への備えを表す〈in case〉が正解です。|S6-case|後ろの節の内容（forget it＝望ましくない事態）から、so that（〜するために）ではなく in case（〜するといけないから）を選ばせる中央大の良問です。
+F1-232|誤文訂正・2空所|c|1956年のオリンピック大会が開催されたのは，メルボルンだった。[It was 空所パターン]\\n(   ) in Melbourne that the 1956 Olympic Games were held.|It was^There was^What was^That was|1|後半の that the 1956 Olympic Games were held と呼応して副詞句 in Melbourne を強調する〈It was ... that 〜〉の構文です（Step 22・232番の別空所パターン）。|S7-err|後ろの that 節との呼応から、強調構文の骨格となる先頭の It was を導き出す問題です。
+F1-233|誤文訂正・2空所|e|【誤文訂正】新政府の政策を検討するために設置された委員会は今月すでに2回の会合があり，税金を減らすべきであるとの決定が下されている。\\nThe committee <span class="text-rose-600 font-bold underline">①that was</span> set up <span class="text-rose-600 font-bold underline">②to review</span> the new government policies <span class="text-rose-600 font-bold underline">③have already met</span> twice this month, and <span class="text-rose-600 font-bold underline">④it has been</span> decided that taxes should be reduced.|① that was^② to review^③ have already met (→ has already met)^④ it has been|3|主語 The committee は関係詞節内で that was set up と単数扱いされているため、本動詞も単数形の〈has already met〉に訂正する必要があります。|S7-err|直前の複数名詞 policies に惑わされて have met としている誤りを見抜かせる正誤問題です。
+F1-234|誤文訂正・2空所|e|【誤文訂正】現在，委員会には多くの才能ある人々がおり，その中には，有名な生物学者であり，20年間教鞭をとっている，ガーデン大学のウィリアム・ローゼンタール氏がいる。\\nNow the committee <span class="text-rose-600 font-bold underline">①has</span> many talented people, <span class="text-rose-600 font-bold underline">②among them</span> William Rosenthal of Garden University, <span class="text-rose-600 font-bold underline">③a famous biologist</span>, who <span class="text-rose-600 font-bold underline">④have been</span> teaching for twenty years.|① has^② among them^③ a famous biologist^④ have been (→ has been)|4|関係代名詞 who の先行詞は William Rosenthal（単数）なので、④の have been は〈has been〉に訂正しなければなりません。|S7-err|people や them に引きずられた動詞の数の一致ミスを発見させる正誤問題です。
+F1-235|誤文訂正・2空所|e|【誤文訂正】この国には今でもよい風習がたくさん残っている。それらには貴重なものもあるが，望ましくないものも多くある。\\nThere still <span class="text-rose-600 font-bold underline">①remains</span> many good customs <span class="text-rose-600 font-bold underline">②in this country</span>. Some of them <span class="text-rose-600 font-bold underline">③are</span> precious, but there are many undesirable <span class="text-rose-600 font-bold underline">④ones</span> also.|① remains (→ remain)^② in this country^③ are^④ ones|1|There構文の意味上の主語は後ろの many good customs（複数）なので、①の単数動詞 remains は複数形の〈remain〉に訂正する必要があります。|S7-err|There の直後だからと単数形 remains にしてしまう典型的な誤りをついた正誤問題です。
+F1-236|誤文訂正・2空所|e|【誤文訂正】負傷した人の数は，予想より多かった。\\n<span class="text-rose-600 font-bold underline">①The number</span> of people who <span class="text-rose-600 font-bold underline">②was</span> injured <span class="text-rose-600 font-bold underline">③was</span> greater than they <span class="text-rose-600 font-bold underline">④had expected</span>.|① The number^② was (→ were)^③ was^④ had expected|2|主節の主語は The number（単数→③ was は正しい）ですが、who の先行詞は直前の people（複数）なので、②の was は〈were〉に訂正します。|S7-err|2つの was のうち、関係詞節内の②だけが誤りであることを見抜かせるハイレベルな正誤問題です。
+F1-237|誤文訂正・2空所|e|【誤文訂正】これまでに，ステイシーはどのデートでも，もっとひどかったことはなかった。\\nNever before <span class="text-rose-600 font-bold underline">①Stacey has</span> <span class="text-rose-600 font-bold underline">②had</span> a <span class="text-rose-600 font-bold underline">③worse time</span> on <span class="text-rose-600 font-bold underline">④any of</span> her dates.|① Stacey has (→ has Stacey)^② had^③ worse time^④ any of|1|否定語句 Never before が文頭に出ているため、疑問文語順に倒置しなければなりません。①の Stacey has を〈has Stacey〉に訂正します。|S7-err|否定語の文頭倒置忘れを見抜かせる正誤判定の定番パターンです。
+F1-238|誤文訂正・2空所|e|【誤文訂正】アメリカ合衆国での教師と生徒の関係は，日本の場合とかなり異なる。\\nThe teacher-student <span class="text-rose-600 font-bold underline">①relationships</span> in the United States <span class="text-rose-600 font-bold underline">②is</span> quite different <span class="text-rose-600 font-bold underline">③from</span> <span class="text-rose-600 font-bold underline">④that</span> in Japan.|① relationships (→ relationship)^② is^③ from^④ that|1|動詞が② is（単数）、比較対象を受ける代名詞も④ that（単数）なので、主語の① relationships を単数形の〈relationship〉に訂正します。|S7-err|後ろの is と that の両方から主語が単数であることを逆算させる上智大の正誤問題です。
+F1-239|誤文訂正・2空所|e|【誤文訂正】外交委員会の委員長であるタナカ氏は，来賓講演者としてその研究会に招待された。\\nMr. Tanaka, the chairperson of the Committee <span class="text-rose-600 font-bold underline">①on Foreign Relations</span>, <span class="text-rose-600 font-bold underline">②were invited</span> <span class="text-rose-600 font-bold underline">③to</span> the seminar <span class="text-rose-600 font-bold underline">④as</span> a guest speaker.|① on Foreign Relations^② were invited (→ was invited)^③ to^④ as|2|主語は単数の Mr. Tanaka なので、直前の Foreign Relations に釣られた② were invited を〈was invited〉に訂正します。|S7-err|同格の挿入句の直後で主語の数を見失わせる正誤問題です。
+F1-240|誤文訂正・2空所|e|【誤文訂正】あなたが日本を訪れる機会はありますか。\\n<span class="text-rose-600 font-bold underline">①Is there</span> any <span class="text-rose-600 font-bold underline">②chances</span> <span class="text-rose-600 font-bold underline">③of</span> <span class="text-rose-600 font-bold underline">④your visiting</span> Japan?|① Is there^② chances (→ chance)^③ of^④ your visiting|2|文頭が① Is there（単数動詞）なので、②の複数形 chances を単数形の〈chance〉に訂正します。|S7-err|文頭の Is と名詞 chances の数の不一致を見抜く正誤問題です。
+F2-136|誤文訂正・2空所|d|自分が間違っていると信じることをするべきではないし，まさに自分が欲しかった本を選ぶべきだ。[共通語]\\n① You should not do (   ) you believe is wrong.\\n② This book is exactly (   ) I wanted.|what^that^which^who|1|①は what (you believe) is wrong で主語となる what、②は exactly what I wanted で wanted の目的語となる what が共通して入ります（Step 16・136番に対応）。|S7-err|挿入節を伴う主格の what と、副詞 exactly の直後の目的格 what を同時に確認する問題です。
+F2-137|誤文訂正・2空所|d|彼はそこで私を見たと言ったがそれはうそだった。／ジブリ美術館は私が訪れたい場所だ。[共通語]\\n① He said that he saw me there, (   ) was a lie.\\n② Ghibli Museum is a place (   ) I want to visit.|which^what^where^that|1|①はカンマの後ろで前文全体を受ける非制限用法（that不可）、②は他動詞 visit の目的語となる関係代名詞（where不可）なので、共通して使えるのは which です（Step 16・137番に対応）。|S7-err|①で that を消し、②で where を消して、共通解 which を導き出す良問です。
+F2-138|誤文訂正・2空所|d|もっと一生懸命勉強しなければ試験に合格しないだろう。／もっと速く運転しなければコンサートに遅れるだろう。[共通語]\\n① (   ) you study much harder, you won't pass the exam.\\n② (   ) you drive faster, you will be late for the concert.|Unless^If^Since^Though|1|どちらも「〜しない限り・もし〜しなければ」という除外・否定条件を表す接続詞 Unless が入ります（Step 17・138番に対応）。|S7-err|主節の否定的な結果（合格しない／遅れる）から逆算して Unless を選ぶ問題です。
+F2-139|誤文訂正・2空所|d|ただおもしろければどんな本でもかまわない。／夕食に間に合って帰宅するのなら買い物に行ってもいい。[共通語]\\n① Any book will do as (   ) as it is interesting.\\n② You can go shopping, as (   ) as you come home in time for dinner.|long^far^soon^well|1|どちらも「〜しさえすれば・〜する限りは（条件）」を表す〈as long as〉を作るため long が入ります（Step 17・139番に対応）。|S7-err|範囲の as far as との混同を防ぐ重要パターンです。
+F2-140|誤文訂正・2空所|d|彼は運転免許証もクレジットカードも持っていなかった。[相関ペア]\\nHe had ( ①    ) his driver's license ( ②    ) his credit card with him.|① neither / ② nor^① either / ② nor^① neither / ② or^① both / ② and|1|「AもBも〜ない」を表す相関接続詞〈neither A nor B〉のペアです（Step 17・140番に対応）。|S7-err|neither と nor の正確な組み合わせを問うています。
+F2-141|誤文訂正・2空所|d|私は夏の別荘を建てるためにその土地を買った。[目的の相関ペア]\\nI bought the land ( ①    ) I ( ②    ) build a summer house.|① so that / ② could [would]^① in case / ② should^① so as / ② to^① in order / ② can|1|「〜するために」を表す目的の副詞節〈so that S + could [would] V〉です。主節が過去形 bought なので助動詞も過去形 could / would になります（Step 17・141番に対応）。|S7-err|so that と助動詞の時制の一致（could/would）をセットで問う問題です。
+F2-142|誤文訂正・2空所|d|その学校は10年前とすっかり変わっている。／彼が私を今日の私にしてくれた。[共通語]\\n① The school is quite different from (   ) it was ten years ago.\\n② He's made me (   ) I am today.|what^that^which^as|1|①は〈what it was（過去の姿）〉、②は〈what I am today（現在の姿）〉で、どちらも「Sの姿・状態」を表す関係代名詞 what が入ります（Step 16・142番に対応）。|S7-err|〈what S is/was〉の最重要構文2題をまとめて習得できる問題です。
+V-01|Vintage 演習(56問)|c|私は株式市場に投資して一財産築くなどとは夢にも思わなかった。[Vintage 494]\\nNever (   ) I dream of making a fortune by investing in the stock market.|have^had^did^am|3|否定の副詞 Never が文頭に出ているため、後ろは疑問文の語順になります。空所の後ろが原形 dream なので、過去の助動詞 did が正解です（have / had なら後ろは過去分詞 dreamed になります）。|V-inv|文頭の Never による倒置と、直後の動詞が原形（dream）であることから助動詞 did を選ばせる問題です。
+V-02|Vintage 演習(56問)|c|「私はこれまでにここに来たことがありません」「そうなのですか？ 私も来たことがありません」[Vintage 500]\\n"I haven't been here before."\\n"Is that so? (   )."|Nor I haven't^I haven't neither^Neither have I^I neither did|3|前文が現在完了の否定（haven't been）なので、助動詞 have を引き継いで〈Neither have I.〉と倒置します。Neither 自体が否定語なので haven't は使えません。|V-inv|前文の助動詞 have を正しく引き継ぎ、かつ二重否定を避ける定番問題です。
+V-03|Vintage 演習(56問)|c|「私は数学の小テストで1つも間違いをしなかったよ！」「私もです」[Vintage 501]\\n"I didn't make any mistakes in the math quiz!"\\n"(   ) did I."|Yet^Also^But^Nor|4|否定文を受けて「私も〜ない」と同意するときは〈Nor [Neither] ＋助動詞＋主語〉の倒置形にします。|V-inv|否定文に対する相づちとして Neither と同様に使える Nor を選ばせる問題です。
+V-04|Vintage 演習(56問)|c|燃料価格が上昇するにつれて，バス会社は運賃を引き上げ，航空会社も同様に引き上げた。[Vintage 502]\\nAs fuel prices rose, bus companies raised their fares and (   ).|neither the airlines did^so the airlines have done^neither did the airlines^so did the airlines|4|前半が肯定文（raised their fares＝過去形）なので、「航空会社も同様にした」は〈so ＋ did ＋主語(the airlines)〉の倒置形になります。|V-inv|肯定文への同意（so）＋一般動詞過去形（did）＋倒置語順（V＋S）の3点を問うています。
+V-05|Vintage 演習(56問)|c|それはあまりにも難しすぎる問題だったので，だれも解くことができなかった。[Vintage 505]\\nIt was much (   ) problem, so nobody was able to solve it.|too difficult^too a difficult^a too difficult^too difficult a|4|〈too ＋形容詞＋ a(n) ＋単数可算名詞〉の特殊語順です。so / as / too / how が形容詞を修飾するとき、冠詞 a(n) は必ず形容詞の後ろ（名詞の直前）に置きます。|V-inv|〈too 形容詞 a 単数名詞〉という冠詞の位置の特殊ルールを問う超頻出問題です。
+V-06|Vintage 演習(56問)|c|彼はとても忍耐強い先生だと私は思う。[Vintage 506]\\nI think he is (   ) teacher.|a such patient^so a patient^such a patient^a so patient|3|such は形容詞的な働きをするため〈such ＋ a(n) ＋形容詞＋単数名詞〉の語順になります（so を使うなら so patient a teacher）。|V-inv|〈such a 形容詞 名詞〉と〈so 形容詞 a 名詞〉の語順の対比を問うています。
+V-07|Vintage 演習(56問)|c|うちの子どもは部屋じゅうにおもちゃを散らかすので，私がそれを拾い集めなければならない。[Vintage 507]\\nMy child leaves her toys all over the room and I have to pick (   ).|up them^themselves up^up themselves^them up|4|〈他動詞＋副詞（pick up）〉の目的語が代名詞（them）のときは、必ず〈pick them up〉のように動詞と副詞の間に挟みます（pick up them は不可）。|V-cleft|句動詞の目的語が人称代名詞（it / them）のときの語順ルールを問うています。
+V-08|Vintage 演習(56問)|c|その女性はとても物静かで，話しかけられない限り話をしない。[Vintage 508]\\nThe lady is very quiet and doesn't speak unless (   ).|spoken to^she is not spoken^she speaks^never speaking|1|本来は unless (she is) spoken to ですが、主節の主語と同じ〈she is〉が省略されています。「話しかける」は〈speak to 人〉なので受動態でも前置詞 to が残ります。|V-cleft|副詞節内の S+be 省略と、群動詞〈speak to〉の受動態で to が残る語法を同時に狙っています。
+V-09|Vintage 演習(56問)|c|この長い小論文には，たとえあるにしてもほとんど間違いがない。[Vintage 509]\\nThere are few mistakes, if (   ), in this long essay.|there are^even^any^some|3|〈few / little, if any, ＋名詞〉で「たとえあるとしてもほとんど〜ない」を表す慣用的な挿入省略表現です（if there are any mistakes の省略）。|V-cleft|否定的な数量語 few とセットで使う挿入表現〈if any〉を正確に選べるかを問うています。
+V-10|Vintage 演習(56問)|c|サッチャー夫妻は，晩には，あるとしてもめったに外出しない。[Vintage 510]\\nMr. and Mrs. Thatcher seldom, if (   ), go out in the evening.|little^ever^any^few|2|頻度を表す否定語 seldom / rarely とセットで「たとえあるとしてもめったに〜ない」を表すときは〈seldom, if ever〉を用います。|V-cleft|数量の〈if any〉と頻度の〈if ever〉の使い分けを問うています。
+V-11|Vintage 演習(56問)|c|来週までにそのプロジェクトを完了させることは，簡単ではないにしても，可能なはずだ。[Vintage 511]\\nIt should be possible, (   ) easy, to complete the project by next week.|although^as if^before^if not|4|〈A, if not B〉で「BではないにしてもA（＝AであるがBとまではいかなくても）」を表す慣用表現です。|V-cleft|文脈（可能ではあるが簡単とまでは言えない）から〈if not〉を導き出す問題です。
+V-12|Vintage 演習(56問)|c|私たちが旅行をあきらめたのは，彼が病気だったからだった。[Vintage 513]\\nIt was because he was ill (   ) we gave up traveling.|as^that^so^for|2|理由を表す副詞節〈because he was ill〉を It was と that の間に挟んで強調した強調構文です。|V-cleft|〈It was because 〜 that ...〉の強調構文の骨格を見抜けるかを問うています。
+V-13|Vintage 演習(56問)|c|あなたが一緒にその部屋に入って行ったのはだれでしたか。[Vintage 515]\\n(   ) you went into the room with?|Who she was^What is she^Who was it that^Who it was that|3|強調構文 It was Who that you went into the room with. を疑問文にした形で、疑問詞 Who が文頭に出たあと〈was it that ...〉の疑問文語順になります。|V-cleft|疑問詞を強調する強調構文の疑問文語順〈Who was it that ...?〉を問うています。
+V-14|Vintage 演習(56問)|c|いったいぜんたい何をしているのですか。[Vintage 518]\\nWhat (   ) earth are you doing?|from^on^for^by|2|疑問詞の直後に〈on earth〉を置いて「いったいぜんたい」と疑問を強める慣用表現です。|V-cleft|疑問詞強調のイディオム〈What on earth ...?〉の前置詞 on を問うています。
+V-15|Vintage 演習(56問)|c|母は私に「森の中でオオカミに話しかけてはいけません」と言った。[Vintage 521]\\nMy mother said to me, "Don't talk to wolves in the woods."\\n＝ My mother told (   ) in the woods.|to me not to speak wolves^me to speak not wolves^me not to talk to wolves^not to me talk to wolves|3|否定の命令文（Don't V...）を間接話法に転換するときは〈tell ＋人＋ not to V〉の形にします。また「〜に話しかける」は〈talk to 〜〉です。|V-nar|〈tell O not to V〉の語順と、自動詞 talk に必要な前置詞 to を問うています。
+V-16|Vintage 演習(56問)|c|我々は，彼がその試合に負けるなどとは思ってもみなかった。（整序完成）[Vintage 495]\\n(   ) he would lose the game.|Little did we think that^We little did think that^No did we think that^Little we thought that|1|準否定語 Little が文頭に出ると疑問文語順に倒置され、〈Little did we think that ...（〜とは夢にも思わなかった）〉となります（no は不要語）。|V-inv|否定語 Little の文頭倒置〈Little did S think that ...〉の正確な語順を問うています。
+V-17|Vintage 演習(56問)|c|今ほど緊張したことはこれまでになかった。（整序完成）[Vintage 496]\\nAt (   ) than I am now.|no time have I been more nervous^no time I have been more nervous^been no time have I more nervous^no time did I have more nervous|1|否定語を含む副詞句〈At no time（これまで一度も〜ない）〉が文頭に出ているため、後ろが〈have I been more nervous〉と現在完了の疑問文語順に倒置されます。|V-inv|〈At no time〉による文頭倒置と現在完了経験用法の語順を問うています。
+V-18|Vintage 演習(56問)|c|労働者は賃上げを要求するだけでなく，労働時間の削減も望んでいる。（整序完成）[Vintage 497]\\nNot (   ), but they also want reduced hours.|only do the workers want a pay increase^only the workers do want a pay increase^only want the workers a pay increase^do only the workers want a pay increase|1|否定語を伴う〈Not only〉が文頭に出ると、前半の節が疑問文語順に倒置され〈Not only do the workers want a pay increase〉となります。|V-inv|文頭の Not only による倒置語順〈Not only ＋助動詞＋S＋V〉を問うています。
+V-19|Vintage 演習(56問)|c|最近になってようやく，親の教えの大切さがわかった。（整序完成）[Vintage 498]\\nOnly (   ) the importance of my parents' lessons.|recently have I realized^recently I have realized^have I recently realized^I have recently realized|1|〈Only ＋副詞(recently)〉が強調のため文頭に出ると、後ろの主節が疑問文語順に倒置され〈Only recently have I realized ...〉となります。|V-inv|Only＋副詞句が文頭に出たときの倒置ルールを問う重要問題です。
+V-20|Vintage 演習(56問)|c|そのオペラはイタリア語で公演され，私には一言もわからなかったし，そのストーリーも知らなかった。（整序完成）[Vintage 499]\\nThe opera was performed in Italian, and I did not understand a word of it, (   ).|nor did I know the story^nor I did know the story^nor I knew the story^did I nor know the story|1|否定の等位接続詞 nor が節頭に立つと、後ろが疑問文語順に倒置され〈nor did I know the story〉となります。|V-inv|nor の直後の倒置語順〈nor ＋助動詞＋S＋原形〉を正確に組み立てられるかを問うています。
+V-21|Vintage 演習(56問)|c|先週の日曜日はとても天気がよかったので田舎にドライブに出かけた。（整序完成）[Vintage 503]\\nLast Sunday was (   ) took a drive in the country.|so beautiful a day that we^such beautiful a day that we^so a beautiful day that we^a so beautiful day that we|1|so が形容詞 beautiful を修飾するため〈so ＋形容詞(beautiful)＋ a ＋単数名詞(day)＋ that S + V〉の語順になります。|V-inv|〈so 形容詞 a 単数名詞 that〉の語順を正確に再現できるかを問うています。
+V-22|Vintage 演習(56問)|c|君に解いてもらいたいのはほかでもなくこの問題なんだ。（整序完成）[Vintage 512]\\nIt is this question (   ).|that I want you to solve^that I want to solve you^I want you to solve that^to solve that I want you|1|目的語 this question を強調する〈It is this question that ...〉と、〈want O (you) to V (solve)〉を組み合わせた形です。|V-cleft|強調構文〈It is X that ...〉と〈want O to V〉の正確な語順を問うています。
+V-23|Vintage 演習(56問)|c|警察が到着したのは，事故があって２時間も経ってからでした。（整序完成）[Vintage 514]\\nIt was (   ) arrived.|not until two hours after the accident that the police^until two hours after the accident not that the police^not two hours after the accident until that the police^two hours after the accident not until that the police|1|〈It is [was] not until A that B（Aになって初めてBした）〉の強調構文です。A の位置に〈two hours after the accident〉が入ります。|V-cleft|入試超頻出の〈It was not until A that B〉の語順を問うています。
+V-24|Vintage 演習(56問)|c|子どもたちが育つ世界は大人が創っている。（整序完成）[Vintage 516]\\n(   ) will grow up.|It is adults who create the world where their children^It is adults create who the world where their children^Adults who it is create the world where their children^It is the world who adults create where their children|1|主語 adults を強調する〈It is adults who create ...〉と、the world を修飾する関係副詞節〈where their children will grow up〉を組み合わせます。|V-cleft|強調構文〈It is 人 who ...〉と関係副詞 where の二重構造を問うています。
+V-25|Vintage 演習(56問)|c|私は，子どものころにピアノが弾けるようになれなかったことを，本当に悔やんでいます。（整序完成）[Vintage 517]\\nI (   ) when I was a child.|do regret not learning to play the piano^not do regret learning to play the piano^do not regret learning to play the piano^regret do not learning to play the piano|1|一般動詞 regret を強める強調の助動詞 do を直前に置き、動名詞の否定〈not learning to play the piano〉を続けた形です（do not regret にすると「後悔していない」と逆の意味になります）。|V-cleft|強調の do（do regret）と動名詞の否定語順（not learning）の組み合わせを問うています。
+V-26|Vintage 演習(56問)|c|これは私が買いたかった，まさにその本です。（整序完成）[Vintage 519]\\nThis (   ).|is the very book that I wanted to buy^is the book very that I wanted to buy^very is the book that I wanted to buy^is very the book that I wanted to buy|1|名詞の直前に〈the very ＋名詞〉を置くと「まさにその〜」という強調になります（後ろの関係代名詞は that を好みます）。|V-cleft|名詞を強める形容詞〈the very ＋名詞〉の語順を問うています。
+V-27|Vintage 演習(56問)|c|確かにそれしか方法がないようです。（桃山学院大・整序完成）[Vintage 517]\\n(   ).|That does seem to be the only thing we can do^That seem to does be the only thing we can do^The only thing we can do does that seem to be^Does that seem to be the only thing we can do|1|主語 That（単数）に続く動詞 seem を強調するため、直前に三人称単数現在の助動詞 does を置いた〈That does seem to be ...〉となります。|V-cleft|強調の助動詞 does（does ＋動詞の原形）を文中で正しく使えるかを問うています。
+V-28|Vintage 演習(56問)|c|ショパンは作曲家であるのと同じくらい優れたピアニストだった。（整序完成）[Vintage 504]\\nChopin (   ) a composer.|was as good a pianist as^was as a good pianist as^as was good a pianist as^was a good as pianist as|1|〈as ＋形容詞(good)＋ a ＋単数名詞(pianist)＋ as ...〉の語順です。as の直後に形容詞 good が来て、冠詞 a は名詞の直前に置かれます。|V-inv|〈as 形容詞 a 単数名詞 as〉の特殊語順を問うています。
+V-29|Vintage 演習(56問)|c|彼は5年間英語を習い続けていると（そのとき）言った。（駒澤大）[Vintage 520]\\n(a) He said that he had been learning English for five years.\\n(b) He said, "(   ) English for five years."|He has been learning^He is learning^I had been learning^I have been learning|4|間接話法の過去完了進行形（had been learning）は、直接話法（発言当時の言葉）に戻すと現在完了進行形（have been learning）になり、主語も I に戻ります。|V-nar|間接話法から直接話法への逆変換（人称と時制の戻し方）を問うています。
+V-30|Vintage 演習(56問)|c|グリーン教授は私たちに「コーヒーブレイクにしましょう」と言った。（東北学院大）[Vintage 523]\\n(a) Professor Greene said to us, "Let's have a coffee break."\\n(b) Professor Greene (   ) that we have a coffee break.|wanted^suggested^commanded^advised|2|「Let's V（〜しよう）」という提案を間接話法にするときは、伝達動詞に〈suggest that S (should) ＋動詞の原形〉を用います。|V-nar|Let's を含む直接話法を〈suggest that S (should) 原形〉に書き換える定番問題です。
+V-31|Vintage 演習(56問)|c|母は私に「宿題は終えましたか」と尋ねた。（明星大）[Vintage 524]\\n(a) My mother said to me, "Did you finish your homework?"\\n(b) My mother asked me (   ) my homework.|if I finish^if I had finished^if I would have finished^if I would like to finish|2|疑問詞のない疑問文は〈ask O if S + V〉にします。伝達動詞 asked が過去形で、元の質問が過去形（Did you finish）なので、時制の一致により大過去（過去完了）の〈if I had finished〉になります。|V-nar|疑問文の間接話法転換と、過去形から過去完了への時制の一致を問うています。
+V-32|Vintage 演習(56問)|c|ジョンは私に「いつ出発しますか」と尋ねた。（駒澤大）[Vintage 525]\\n(a) John said to me, "When will you leave?"\\n(b) John asked me (   ) I would leave.|how^that^when^what|3|疑問詞 When で始まる疑問文を間接話法にすると、疑問詞 when がそのまま接続詞の働きをして〈asked me when I would leave〉となります。|V-nar|疑問詞つき疑問文の間接話法転換（疑問詞＋S＋V の平叙文語順）を問うています。
+V-33|Vintage 演習(56問)|c|母は私に「午後11時以降はテレビを見てはいけません」と言った。[Vintage 521]\\n(a) My mother said to me, "Do not watch TV after 11 p.m."\\n(b) My mother told (   ) after 11 p.m.|me to watch not TV^not to me watch to TV^to me not to watch TV^me not to watch TV|4|否定の命令文（Do not V...）は〈tell ＋人＋ not to ＋動詞の原形〉に転換します。|V-nar|〈tell O not to V〉の語順（not は to の直前）を正確に選べるかを問うています。
+V-34|Vintage 演習(56問)|c|テープの録音を聴くことで睡眠中に学習できる人はめったにいない。（東海大）[Vintage 494]\\n(   ) learn during their sleep by listening to tape recordings.|People rare can^Rarely can people^Can people rarely^Can rare people|2|準否定の副詞 Rarely（めったに〜ない）が強調のため文頭に出ているため、後ろが〈can people learn〉と疑問文語順に倒置されます。|V-inv|準否定語 Rarely の文頭倒置〈Rarely ＋助動詞＋S＋原形〉を問うています。
+V-35|Vintage 演習(56問)|c|来世での運を良くしようと熱心なビルマ人たちは像に金箔を貼り、募金箱に紙幣を詰め込み、忙しく仏塔を建てる。他のどの仏教国でも、これほどのまばゆい光景を私は見たことがない。（法政大）[Vintage 496]\\nKeen to improve their chances in the next life, the Burmese pile gold leaf onto their statues, stuff donation boxes with banknotes and busily construct pagodas. In no other Buddhist country (   ) such dazzle.|you can witness^do people^there is^have I seen|4|否定語句〈In no other Buddhist country〉が文頭に出ているため、後ろは疑問文の語順になります。①③は倒置されておらず、②は後ろに本動詞がないため、〈have I seen〉が正解です。|V-inv|文頭の否定語句による倒置語順（V＋S）と文構造の両方から正解を絞らせる法政大の良問です。
+V-36|Vintage 演習(56問)|c|私は図書館から借りたDVDをまだ見ていないし，宿題を終えるまでは見るつもりもない。（北里大）[Vintage 499]\\nI haven't watched the DVD I borrowed from the library yet, (   ) will I until I have finished my homework.|and^but^either^if^nor|5|後ろが〈will I〉と疑問文語順に倒置されており、「〜するつもりもない」と否定内容をつなぐため、等位接続詞 nor が正解です。|V-inv|後ろの倒置語順（will I）と否定の文脈から nor を導き出す問題です。
+V-37|Vintage 演習(56問)|c|ジョンは決してジャガイモを食べないし，メアリーも食べない。（東海大）[Vintage 500]\\nJohn never eats potatoes and (   ).|so doesn't Mary^neither doesn't Mary^neither does Mary^so Mary does|3|前半が never（否定）を含む一般動詞現在形なので、「メアリーも〜ない」は〈neither does Mary〉となります（neither と doesn't を重ねると二重否定で誤り）。|V-inv|never に反応して neither を選び、二重否定を避けて〈neither does Mary〉とできるかを問うています。
+V-38|Vintage 演習(56問)|c|メアリーは昨夜映画に行った。私も行った。（東海大）[Vintage 502]\\nMary went to the cinema last night. So (   ).|I go^went I^I do^did I|4|前文が肯定の過去形（went）なので、「私もそうした」は代動詞 did を用いて〈So did I.〉とします（went I とは言いません）。|V-inv|一般動詞の過去形を受けた〈So did I.〉の形を問うています。
+V-39|Vintage 演習(56問)|c|彼女はとても有能な秘書なので，上司はオフィスのだれよりも彼女を信頼している。（杏林大）[Vintage 503]\\nShe is (   ) that her boss trusts her more than anyone in the office.|so able a secretary^able so a secretary^so an able secretary^so able secretary|1|〈so ＋形容詞(able)＋ a ＋単数名詞(secretary)＋ that ...〉の特殊語順です。|V-inv|〈so 形容詞 a 単数名詞〉の語順を正確に選べるかを問うています。
+V-40|Vintage 演習(56問)|c|ボブは私がこれまでに会った中で最も親切な人だ。（青山学院大）[Vintage 504]\\nBob is (   ) as I have ever met.|a person nice^as a nice person^an as nice person^as nice a person|4|〈as ＋形容詞(nice)＋ a ＋単数名詞(person)＋ as ...〉の語順です。|V-inv|as の直後に形容詞を置き、冠詞 a を名詞の直前に置く語順ルールを問うています。
+V-41|Vintage 演習(56問)|c|彼はとても不注意なやり方でレポートを書いたので，先生はそれを読むことができなかった。（昭和大）[Vintage 506]\\nHe wrote a report (   ) that his teacher could not read it.|in a so careless manner^in so a careless manner^in a such careless manner^in such a careless manner|4|such を用いる場合は〈in such a careless manner that ...〉の語順になります（so なら in so careless a manner）。|V-inv|〈such a 形容詞 名詞〉の語順を前置詞句の中で正確に選べるかを問うています。
+V-42|Vintage 演習(56問)|c|医師「スミスさん，あなたはたばこをやめなければなりませんよ」スミスさん「ああ無理です，先生。10歳のときから吸っているんです」（国立看護大学校）[Vintage 507]\\nDoctor：You're going to have to (   ) Mr Smith.\\nMr Smith：Oh I can't, doctor. I've been smoking since I was 10.|give up it^give it up^give it out^give in it|2|〈give up（〜をやめる）〉の目的語が代名詞 it のときは、必ず動詞と副詞の間に挟んで〈give it up〉とします。|V-cleft|句動詞＋代名詞の語順〈give it up〉を問う基本問題です。
+V-43|Vintage 演習(56問)|c|がんはほとんどの場合，早期に発見されれば治すことができる。（九州産業大）[Vintage 508]\\nCancers in most cases can be cured if (   ) in time.|discover^discovering^to discover^discovered|4|本来は if (they are) discovered in time（もしそれらが早期に発見されれば）ですが、主節の主語 Cancers を受ける〈they are〉が省略され、過去分詞 discovered だけが残っています。|V-cleft|接続詞 if の直後で S+be が省略された〈if ＋過去分詞（〜されれば）〉の形を問うています。
+V-44|Vintage 演習(56問)|c|日本がどれほど混雑しているかに私たちが気づくのは，海外に行って初めてのことだ。（福岡大）[Vintage 514]\\nIt's not (   ) we go abroad that we realize how crowded Japan is.|during^until^by^while|2|〈It is not until A that B（Aになって初めてBする）〉の強調構文です。|V-cleft|〈It is not until 〜 that ...〉の定型構文を問うています。
+V-45|Vintage 演習(56問)|c|会計の責任をとったのはジョンだった。（関西学院大）[Vintage 516]\\nIt (   ) John who took responsibility for the accounts.|became^came^seemed^was|4|後半の〈who took responsibility ...〉が過去形なので、強調構文の be動詞も過去形の was を用いて〈It was John who ...〉とします。|V-cleft|強調構文の時制の一致（後半が過去形なら It was）を問うています。
+V-46|Vintage 演習(56問)|c|彼女はその知らせに驚いた。彼女は一言も発しなかった。（上智大）[Vintage 494]\\nShe was surprised at the news. Not a word (   ) she say.|did^but^that^as|1|目的語である否定語句〈Not a word（一言も〜ない）〉が文頭に出ているため、後ろが〈did she say〉と疑問文語順に倒置されます。|V-inv|目的語に否定語（Not a word）がついて文頭に出たときの倒置を問う上智大の問題です。
+V-47|Vintage 演習(56問)|c|彼らは気が狂っているわけでもないし，愚か者でもない。（上智大）[Vintage 499]\\nThey are not crazy, (   ) are they fools.|or^nor^both^either|2|後ろが〈are they fools〉と疑問文語順に倒置されているため、否定の等位接続詞 nor を選びます（or なら倒置は起きません）。|V-inv|後続の倒置語順（are they）から nor を特定させる上智大の良問です。
+V-48|Vintage 演習(56問)|c|コウタロウはスパゲッティがあまり好きではない。サトルも好きではない！（東海大）[Vintage 500]\\nKotaro doesn't really like spaghetti. (   )!|Satoru does, neither^Neither does Satoru^So does Satoru^Satoru doesn't, though|2|前文が否定（doesn't like）なので、「サトルも〜ない」は〈Neither does Satoru〉の倒置形にします。|V-inv|否定文への同意表現〈Neither ＋ V ＋ S〉の基本を問うています。
+V-49|Vintage 演習(56問)|c|私は自分のテスト結果に満足していないし，母も満足していない。（神戸松蔭女子学院大）[Vintage 501]\\nI am not satisfied with my test results; nor (   ) my mother.|is^does^did^has|1|前文の動詞が be動詞（am not satisfied）なので、nor の後ろも be動詞を用いて〈nor is my mother〉とします（主語が my mother なので is）。|V-inv|前文の be動詞を引き継ぎ、かつ主語 my mother に合わせて is を選ばせる問題です。
+V-50|Vintage 演習(56問)|c|彼はだれもが望みうる限り最も忍耐強い医師だった。（東京理科大）[Vintage 504]\\nHe was (   ) as anyone could have had.|as a patient doctor^as patient a doctor^as patient the doctor^as the patient doctor|2|〈as ＋形容詞(patient)＋ a ＋単数名詞(doctor)＋ as ...〉の語順です。|V-inv|〈as 形容詞 a 単数名詞 as〉の語順を正確に選べるかを問うています。
+V-51|Vintage 演習(56問)|c|アメリカ人の50パーセント以上がビタミンやミネラルのサプリメントを毎日摂取していると報告しているが，ビタミンやミネラルは過剰に摂取されると薬のように作用することがある。（日本大）[Vintage 508]\\nAlthough more than 50 percent of Americans report taking vitamin and mineral supplements daily, vitamins and minerals can act like drugs when (   ) in excess.|taking^to take^taken^took|3|本来は when (they are) taken in excess（過剰に摂取されるとき）ですが、主節の主語 vitamins and minerals を受ける〈they are〉が省略され、過去分詞 taken になっています。|V-cleft|接続詞 when の直後で S+be が省略された〈when ＋過去分詞（〜されるとき）〉を問うています。
+V-52|Vintage 演習(56問)|c|私たちが自分の健康に気を使い始めるのは，病気になって初めてのことだ。（玉川大）[Vintage 514]\\nIt is not (   ) we get sick that we start taking care of our health.|even^until^provided^while|2|〈It is not until A that B（Aになって初めてBする）〉の強調構文です。|V-cleft|〈It is not until 〜 that ...〉の定型表現を問うています。
+V-53|Vintage 演習(56問)|c|イギリスで首相になったのはデービッド・キャメロンだった。（椙山女学園大）[Vintage 516]\\nIt was David Cameron (   ) became Prime Minister in Britain.|which^who^what^how|2|強調される語句が「人（David Cameron）」で、後ろの節の主語になっているため、that の代わりに主格の who を使うことができます。|V-cleft|強調構文で人を強調するときの関係代名詞 who の用法を問うています。
+V-54|Vintage 演習(56問)|c|いったいなぜあなたはそんなことを言ったのですか。（京都光華女子大）[Vintage 518]\\nWhy on (   ) did you say such a thing?|all^earth^foot^heaven|2|疑問詞 Why の直後に〈on earth〉を置いて「いったいなぜ」と強調しています。|V-cleft|疑問詞強調のイディオム〈Why on earth ...?〉を問うています。
+V-55|Vintage 演習(56問)|e|【誤文訂正】花子は太郎にだまされたとばかり思い込んでいたが，後になって実は花子をだましたのは次郎だったことを知った。（京都産業大）[Vintage 512]\\nHanako believed that she <span class="text-rose-600 font-bold underline">①had been fooled</span> by Taro, but <span class="text-rose-600 font-bold underline">②later learned</span> that <span class="text-rose-600 font-bold underline">③it was</span> actually Jiro <span class="text-rose-600 font-bold underline">④that she was fooled</span>.|① had been fooled^② later learned^③ it was^④ that she was fooled (→ that fooled her)|4|「花子をだましたのは次郎だった（能動）」なので、It was actually Jiro that fooled her に訂正する必要があります（④のままだと Jiro の入る場所がなく文が破綻します）。|V-cleft|強調構文の後ろの節が能動態か受動態かを文構造から見抜かせる京都産業大の正誤問題です。
+V-56|Vintage 演習(56問)|c|私が昨日ここで会ったのはアンディでした。（立正大）[Vintage 512]\\n(   ) here yesterday.|It was Andy whom I met^It was Andy I met whom^Andy it was whom I met^It is Andy whom I met|1|目的語の人（Andy）を強調し、時制が過去（yesterday）なので〈It was Andy whom I met here yesterday.〉となります。|V-cleft|強調構文〈It was 人 whom S + V〉の時制と語順を問うています。
+`;
+
+    // 圧縮された文字列からJavaScriptのオブジェクト配列に変換
+    const qData = rawData.trim().split('\n').map(line => {
+      const p = line.split('|');
+      if (p.length < 9) return null;
+      return {
+        i: p[0], s: p[1], t: p[2], 
+        q: p[3].replace(/\\n/g, '\n'), 
+        c: p[4] ? p[4].split('^') : [], 
+        a: parseInt(p[5], 10), 
+        e: p[6],
+        g: p[7],
+        m: p[8]
+      };
+    }).filter(Boolean);
+
+    let state = {
+      currentMode: 'menu', 
+      questions: [],
+      currentIndex: 0,
+      score: 0,
+      mistakes: JSON.parse(localStorage.getItem('pf850VintageMistakes') || '[]'),
+      progress: JSON.parse(localStorage.getItem('pf850VintageProgress') || '{}'),
+      currentQuizMode: null,
+      isAnswered: false,
+      selectedAnswer: null,
+      isCorrect: false
+    };
+
+    function setState(newState) {
+      state = { ...state, ...newState };
+      if (newState.mistakes !== undefined) {
+        localStorage.setItem('pf850VintageMistakes', JSON.stringify(state.mistakes));
+      }
+      if (newState.progress !== undefined) {
+        localStorage.setItem('pf850VintageProgress', JSON.stringify(state.progress));
+      }
+      render();
+    }
+
+    function getQuestionTypeLabel(type) {
+      if (type === 'e') return '誤文訂正問題（誤りを含む箇所を選択）';
+      if (type === 'd') return '2空所・共通語補充問題';
+      return '四択問題（空所に適切な語句を選択）';
+    }
+
+    window.startQuiz = function(mode, resume = false) {
+      let targetQuestions = [];
+      let currentIdx = 0;
+      let currentScore = 0;
+
+      if (resume && state.progress[mode]) {
+        const prog = state.progress[mode];
+        targetQuestions = prog.order.map(id => qData.find(q => q.i === id)).filter(Boolean);
+        currentIdx = prog.currentIndex;
+        currentScore = prog.score;
+      } else {
+        if (mode === 'all') {
+          targetQuestions = [...qData].sort(() => Math.random() - 0.5);
+        } else if (mode === 'mistakes') {
+          targetQuestions = qData.filter(q => state.mistakes.includes(q.i)).sort(() => Math.random() - 0.5);
+        } else {
+          targetQuestions = qData.filter(q => q.s === mode).sort(() => Math.random() - 0.5);
+        }
+
+        if (targetQuestions.length === 0) {
+          alert('出題できる問題がありません。');
+          return;
+        }
+
+        state.progress[mode] = { order: targetQuestions.map(q => q.i), currentIndex: 0, score: 0 };
+        localStorage.setItem('pf850VintageProgress', JSON.stringify(state.progress));
+      }
+
+      setState({
+        currentMode: 'quiz',
+        currentQuizMode: mode,
+        questions: targetQuestions,
+        currentIndex: currentIdx,
+        score: currentScore,
+        isAnswered: false,
+        selectedAnswer: null,
+        isCorrect: false
+      });
+    };
+
+    window.goNext = function() {
+      if (state.currentIndex + 1 < state.questions.length) {
+        const nextIdx = state.currentIndex + 1;
+        if (state.progress[state.currentQuizMode]) {
+          state.progress[state.currentQuizMode].currentIndex = nextIdx;
+          state.progress[state.currentQuizMode].score = state.score;
+          localStorage.setItem('pf850VintageProgress', JSON.stringify(state.progress));
+        }
+        setState({ currentIndex: nextIdx, isAnswered: false, selectedAnswer: null, isCorrect: false });
+      } else {
+        if (state.progress[state.currentQuizMode]) {
+          delete state.progress[state.currentQuizMode];
+          localStorage.setItem('pf850VintageProgress', JSON.stringify(state.progress));
+        }
+        setState({ currentMode: 'result' });
+      }
+    };
+
+    window.goToMenu = function() { setState({ currentMode: 'menu' }); };
+
+    window.handleChoiceSubmit = function(choiceIndex) {
+      if (state.isAnswered) return;
+      const currentQ = state.questions[state.currentIndex];
+      const isCorrect = (choiceIndex + 1) === currentQ.a;
+      let newMistakes = [...state.mistakes];
+      let newScore = state.score;
+
+      if (isCorrect) {
+        newScore += 1;
+        newMistakes = newMistakes.filter(id => id !== currentQ.i);
+      } else {
+        if (!newMistakes.includes(currentQ.i)) newMistakes.push(currentQ.i);
+      }
+      setState({ isCorrect, selectedAnswer: choiceIndex + 1, isAnswered: true, score: newScore, mistakes: newMistakes });
+    };
+
+    function renderMenuHtml() {
+      const stepNames = [
+        '一致・数',
+        '倒置・強調・省略',
+        '関係詞',
+        'what・複合関係詞',
+        '接続詞(基本)',
+        '接続詞(条件・譲歩)',
+        '誤文訂正・2空所',
+        'Vintage 演習(56問)'
+      ];
+      let stepsHtml = '';
+      
+      stepNames.forEach(step => {
+        const p = state.progress[step];
+        const hasProgress = p && p.currentIndex > 0 && p.currentIndex < p.order.length;
+        const count = qData.filter(q => q.s === step).length;
+        if (count === 0) return;
+
+        const isVintage = step.startsWith('Vintage');
+        const activeBorder = isVintage
+          ? (hasProgress ? 'border-indigo-500 shadow-md bg-indigo-50' : 'border-indigo-200 hover:border-indigo-400 hover:shadow-md bg-indigo-50/40')
+          : (hasProgress ? 'border-blue-400 shadow-md bg-blue-50' : 'border-slate-200 hover:border-blue-400 hover:shadow-md bg-white');
+
+        stepsHtml += `
+          <div class="flex flex-col relative w-full h-full">
+            <button onclick="startQuiz('${step}', ${hasProgress ? 'true' : 'false'})" class="flex flex-col items-center justify-center border ${activeBorder} text-slate-700 p-3 md:p-4 rounded-xl transition-all h-full w-full">
+              <span class="font-bold text-base md:text-lg ${isVintage ? 'text-indigo-900' : ''}">${step}</span>
+              <span class="text-xs md:text-sm mt-1 ${hasProgress ? 'text-blue-600 font-bold' : 'text-slate-400'}">
+                ${hasProgress ? `続きから ${p.currentIndex}/${p.order.length}問` : `${count}問`}
+              </span>
+            </button>
+            ${hasProgress ? `
+              <button onclick="startQuiz('${step}', false)" class="absolute -top-2 -right-2 bg-white border border-slate-200 shadow-sm rounded-full p-1.5 text-slate-400 hover:text-red-500 transition-colors" title="最初からやり直す">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </button>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      const pAll = state.progress['all'];
+      const hasAllProgress = pAll && pAll.currentIndex > 0 && pAll.currentIndex < pAll.order.length;
+      const pMistakes = state.progress['mistakes'];
+      const hasMistakesProgress = pMistakes && pMistakes.currentIndex > 0 && pMistakes.currentIndex < pMistakes.order.length;
+      const mistakesDisabled = !hasMistakesProgress && state.mistakes.length === 0;
+
+      return `
+        <div class="flex flex-col items-center justify-center h-full p-4 md:p-8 space-y-6 md:space-y-8 fade-in">
+          <div class="text-center space-y-3 md:space-y-4 mt-6 md:mt-12">
+            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full mb-2 tracking-wider">PF 850 + VINTAGE 3RD EDITION</span>
+            <h1 class="text-2xl md:text-4xl font-bold text-slate-800 tracking-tight">POWER FRAME 850 × Vintage 文法道場</h1>
+            <p class="text-sm md:text-base text-slate-500 font-medium">一致・倒置・強調・省略・話法・関係詞・接続詞・誤文訂正（全${qData.length}問）</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 md:gap-4 w-full max-w-2xl">
+            <div class="flex flex-col w-full h-full col-span-2 md:col-span-1">
+              <button onclick="startQuiz('all', ${hasAllProgress ? 'true' : 'false'})" class="flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl shadow-md transition-all transform hover:scale-105 h-full w-full">
+                <div class="flex items-center space-x-2 md:space-x-3">
+                  <i data-lucide="play" class="w-5 h-5 md:w-6 md:h-6"></i>
+                  <span class="text-base md:text-lg font-semibold">${hasAllProgress ? '全問題 (続きから)' : '全問題に挑戦'}</span>
+                </div>
+                <span class="text-xs md:text-sm text-blue-200 mt-1">${hasAllProgress ? `${pAll.currentIndex}/${pAll.order.length}問` : `${qData.length}問`}</span>
+              </button>
+              ${hasAllProgress ? `<button onclick="startQuiz('all', false)" class="mt-2 text-xs md:text-sm text-slate-500 hover:text-blue-600 underline transition-colors text-center">最初からやり直す</button>` : ''}
+            </div>
+
+            <div class="flex flex-col w-full h-full col-span-2 md:col-span-1">
+              <button 
+                onclick="startQuiz('mistakes', ${hasMistakesProgress ? 'true' : 'false'})" 
+                ${mistakesDisabled ? 'disabled' : ''}
+                class="flex flex-col items-center justify-center p-4 rounded-xl shadow-md transition-all h-full w-full ${!mistakesDisabled ? 'bg-orange-500 hover:bg-orange-600 text-white transform hover:scale-105' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
+                <div class="flex items-center space-x-2 md:space-x-3">
+                  <i data-lucide="refresh-cw" class="w-5 h-5 md:w-6 md:h-6"></i>
+                  <span class="text-base md:text-lg font-semibold">${hasMistakesProgress ? '間違えた問題 (続き)' : '間違えた問題'}</span>
+                </div>
+                <span class="text-xs md:text-sm mt-1 opacity-80">${hasMistakesProgress ? `${pMistakes.currentIndex}/${pMistakes.order.length}問` : `${state.mistakes.length}問`}</span>
+              </button>
+              ${hasMistakesProgress ? `<button onclick="startQuiz('mistakes', false)" class="mt-2 text-xs md:text-sm text-slate-500 hover:text-orange-600 underline transition-colors text-center">新しく間違えたリストでやり直す</button>` : ''}
+            </div>
+
+            <div class="col-span-2 pt-4 md:pt-6 pb-1 md:pb-2 border-b border-slate-200">
+              <h2 class="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-wider text-center">分野別に出題</h2>
+            </div>
+            
+            ${stepsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuizHtml() {
+      const currentQ = state.questions[state.currentIndex];
+      const typeLabel = getQuestionTypeLabel(currentQ.t);
+      const concept = conceptGroups[currentQ.g] || { title: "解説ポイント", e: "文脈と文法構造から最適な選択肢を選びましょう。" };
+      
+      let choicesHtml = '';
+      currentQ.c.forEach((choiceText, idx) => {
+        let btnStyle = "bg-white border-2 border-slate-200 text-slate-700 hover:border-blue-400 hover:bg-blue-50";
+        if (state.isAnswered) {
+          if ((idx + 1) === currentQ.a) {
+            btnStyle = "bg-green-100 border-2 border-green-500 text-green-800 font-bold z-10 shadow-md"; 
+          } else if (state.selectedAnswer === (idx + 1)) {
+            btnStyle = "bg-red-50 border-2 border-red-300 text-red-600 line-through opacity-70"; 
+          } else {
+            btnStyle = "bg-slate-50 border-2 border-slate-200 text-slate-400 opacity-50"; 
+          }
+        }
+        choicesHtml += `
+          <button ${state.isAnswered ? 'disabled' : ''} onclick="handleChoiceSubmit(${idx})" class="p-3 md:p-4 rounded-xl text-left transition-all duration-200 ${btnStyle}">
+            <span class="text-sm md:text-base font-medium">${choiceText}</span>
+          </button>
+        `;
+      });
+      const inputAreaHtml = `<div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">${choicesHtml}</div>`;
+
+      let feedbackHtml = '';
+      if (state.isAnswered) {
+        const resultIcon = state.isCorrect 
+          ? `<div class="flex items-center text-green-600"><i data-lucide="check-circle-2" class="w-6 h-6 mr-2"></i><span class="text-lg font-bold">正解！</span></div>`
+          : `<div class="flex items-center text-red-600"><i data-lucide="x-circle" class="w-6 h-6 mr-2"></i><span class="text-lg font-bold">不正解...</span></div>`;
+
+        const btnText = (state.currentIndex + 1 < state.questions.length) ? '次の問題へ' : '結果を見る';
+
+        feedbackHtml = `
+          <div class="mt-4 slide-in">
+            <div class="p-4 md:p-5 rounded-2xl border ${state.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
+              <div class="flex items-center justify-between mb-3">
+                ${resultIcon}
+              </div>
+
+              <!-- 丁寧なポイント解説 (グループ共通) -->
+              <div class="bg-white rounded-xl p-3 md:p-4 border border-blue-100 shadow-sm mb-4">
+                <div class="flex items-center space-x-2 mb-2">
+                  <div class="p-1 md:p-1.5 bg-blue-100 text-blue-700 rounded-md"><i data-lucide="lightbulb" class="w-4 h-4 md:w-5 md:h-5"></i></div>
+                  <h4 class="text-sm md:text-base font-bold text-blue-800">${concept.title}</h4>
+                </div>
+                <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">${concept.e}</p>
+              </div>
+
+              <!-- 個別解説 -->
+              <div class="px-2 py-2 border-l-4 border-slate-300 mb-4 bg-slate-50 rounded-r-lg">
+                <span class="text-xs text-slate-500 font-bold mb-1 block">【この問題の解説】</span>
+                <p class="text-xs md:text-sm text-slate-700 whitespace-pre-line leading-relaxed">${currentQ.e}</p>
+              </div>
+
+              <!-- 作問者の意図 -->
+              <div class="flex items-start space-x-2 px-2 mt-2">
+                <i data-lucide="brain-circuit" class="w-4 h-4 text-orange-500 mt-0.5 shrink-0"></i>
+                <div>
+                  <h4 class="text-xs font-bold text-orange-700 mb-0.5">作問者の意図</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed">${currentQ.m}</p>
+                </div>
+              </div>
+
+              <div class="mt-5 flex justify-end">
+                <button onclick="goNext()" class="flex items-center px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition-transform transform hover:translate-x-1">
+                  ${btnText}
+                  <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="flex flex-col h-full p-2 md:p-4 max-w-4xl mx-auto w-full fade-in">
+          <div class="flex items-center justify-between mb-3 text-xs md:text-sm font-medium text-slate-500 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+            <div class="flex items-center space-x-3 md:space-x-4">
+              <button onclick="goToMenu()" class="flex items-center text-slate-400 hover:text-slate-600 transition-colors" title="メニューへ戻る">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> 中断
+              </button>
+              <span class="flex items-center pl-3 md:pl-4 border-l border-slate-200"><i data-lucide="book-open" class="w-4 h-4 mr-1 md:mr-2 text-blue-500"></i> ${currentQ.s}</span>
+            </div>
+            <span>Question ${state.currentIndex + 1} / ${state.questions.length}</span>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 mb-4 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            <div class="mb-3">
+              <span class="inline-block px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg shadow-sm">
+                ${typeLabel}
+              </span>
+            </div>
+            <p class="text-base md:text-xl font-medium text-slate-800 leading-relaxed whitespace-pre-line">${currentQ.q}</p>
+          </div>
+
+          <div class="flex-grow">
+            ${inputAreaHtml}
+          </div>
+
+          ${feedbackHtml}
+        </div>
+      `;
+    }
+
+    function renderResultHtml() {
+      const accuracy = Math.round((state.score / state.questions.length) * 100) || 0;
+      const strokeColor = accuracy >= 80 ? '#22c55e' : accuracy >= 60 ? '#f59e0b' : '#ef4444';
+      const circumference = 2 * Math.PI * 45;
+      const offset = circumference * (1 - accuracy / 100);
+
+      let mistakesBtnHtml = '';
+      if (state.mistakes.length > 0) {
+        mistakesBtnHtml = `
+          <button onclick="startQuiz('mistakes')" class="flex-1 flex items-center justify-center py-3 md:py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-md transition-colors text-sm md:text-base">
+            <i data-lucide="refresh-cw" class="w-4 h-4 md:w-5 md:h-5 mr-2"></i> 間違えた問題
+          </button>
+        `;
+      }
+
+      return `
+        <div class="flex flex-col items-center justify-center h-full p-4 md:p-8 space-y-6 md:space-y-8 fade-in mt-6 md:mt-12">
+          <div class="text-center space-y-2">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800">学習完了！</h2>
+            <p class="text-sm md:text-base text-slate-500">今回のスコア</p>
+          </div>
+
+          <div class="relative flex items-center justify-center w-40 h-40 md:w-48 md:h-48 bg-white rounded-full shadow-xl border-4 border-slate-50">
+            <svg class="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="8" />
+              <circle cx="50" cy="50" r="45" fill="none" stroke="${strokeColor}" stroke-width="8" 
+                stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" 
+                class="transition-all duration-1000 ease-out" />
+            </svg>
+            <div class="text-center">
+              <span class="text-4xl md:text-5xl font-black text-slate-800">${accuracy}</span>
+              <span class="text-lg md:text-xl font-bold text-slate-400">%</span>
+              <div class="text-xs md:text-sm font-medium text-slate-500 mt-1">${state.score} / ${state.questions.length} 正解</div>
+            </div>
+          </div>
+
+          <div class="flex space-x-3 md:space-x-4 pt-4 md:pt-8 w-full max-w-md">
+            <button onclick="goToMenu()" class="flex-1 flex items-center justify-center py-3 md:py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors text-sm md:text-base">
+              <i data-lucide="list-checks" class="w-4 h-4 md:w-5 md:h-5 mr-2"></i> メニュー
+            </button>
+            ${mistakesBtnHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+      let html = '';
+      if (state.currentMode === 'menu') html = renderMenuHtml();
+      else if (state.currentMode === 'quiz') html = renderQuizHtml();
+      else if (state.currentMode === 'result') html = renderResultHtml();
+
+      app.innerHTML = html;
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.addEventListener("DOMContentLoaded", render);
+  </script>
+</body>
+</html>
